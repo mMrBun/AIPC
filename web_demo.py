@@ -6,6 +6,7 @@ from llms.chatglm3.generate import chat_process
 
 
 def text_analysis(text, top_p, temperature):
+
     code, response = chat_process(text, top_p, temperature)
 
     locals_dict = {}

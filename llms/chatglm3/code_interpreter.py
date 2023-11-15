@@ -11,20 +11,19 @@ TRUNCATE_LENGTH = 1024
 def is_valid_python(code: str) -> bool:
     try:
         code = extract_code(code)
-        # 尝试编译代码
+
         compiled_code = compile(code, '<string>', 'exec')
     except Exception as e:
-        # 如果编译失败（例如，代码中包含语法错误），返回False
+
         return False
 
     try:
-        # 如果编译成功，执行代码
+
         exec(compiled_code)
     except Exception:
-        # 如果执行失败，返回False
+
         return False
 
-    # 如果编译和执行都成功，返回True
     return True
 
 
