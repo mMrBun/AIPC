@@ -4,7 +4,7 @@ import json
 
 from PIL.Image import Image
 
-TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following tools:\n'
+TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following core:\n'
 
 
 class Role(Enum):

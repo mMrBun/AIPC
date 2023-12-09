@@ -7,3 +7,11 @@ def create_prompt(data):
     ```
     """
     return template
+
+
+def create_system_prompt(tools):
+    system_prompt = {"role": "system",
+                     "content": "Answer the following questions as best as you can. You have access to the following core:",
+                     "core": tools}
+
+    return system_prompt

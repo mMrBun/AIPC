@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 import os
-from typing import Any, Protocol
+from typing import Any, Protocol, List
 
 from huggingface_hub.inference._text_generation import TextGenerationStreamResponse, Token
 import torch
@@ -10,7 +10,7 @@ from transformers import AutoModel, AutoTokenizer, AutoConfig
 
 from .conversation import Conversation
 
-TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following tools:'
+TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following core:'
 
 MODEL_PATH = os.environ.get('MODEL_PATH', '/data/models/llm/chatglm3-6b')
 PT_PATH = os.environ.get('PT_PATH', None)
@@ -32,6 +32,9 @@ class Client(Protocol):
         ...
 
     def generate_chat(self, query, history, role=None):
+        ...
+
+    def format_glm_tools_schema(self, list_of_plugin_info):
         ...
 
 
@@ -138,7 +141,7 @@ class HFClient(Client):
         }]
 
         if tools:
-            chat_history[0]['tools'] = tools
+            chat_history[0]['core'] = tools
 
         for conversation in history[:-1]:
             chat_history.append({
@@ -173,3 +176,35 @@ class HFClient(Client):
 
     def generate_chat(self, query, history, role="user"):
         return self.model.chat(tokenizer=self.tokenizer, query=query, history=history, role=role)
+
+
+    def format_glm_tools_schema(self, list_of_plugin_info):
+        new_list_plugin_info = []
+        for item in list_of_plugin_info:
+            item['name_for_human'] = item.pop('tool_name')
+            item['name_for_model'] = item.pop('api_name')
+            item['description_for_model'] = item.pop('api_description')
+            item['parameters'] = []
+            item['response'] = []
+            required_parameters = item.pop('required_parameters')
+            optional_parameters = item.pop('optional_parameters')
+            for param in required_parameters:
+                param_entity = {
+                    "name": param.get("name"),
+                    "type": param.get("type"),
+                    "description": param.get("description"),
+                    "required": True
+                }
+                item['parameters'].append(param_entity)
+            for param in optional_parameters:
+                param_entity = {
+                    "name": param.get("name"),
+                    "type": param.get("type"),
+                    "description": param.get("description"),
+                    "required": False
+                }
+                item['parameters'].append(param_entity)
+            new_list_plugin_info.append(item)
+        return new_list_plugin_info
+
+

@@ -3,3 +3,5 @@ torch>=2.0
 gradio
 ipython
 sentencepiece
+sentence_transformers
+pyecharts

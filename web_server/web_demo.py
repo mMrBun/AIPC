@@ -2,12 +2,12 @@ import re
 
 import gradio as gr
 from matplotlib import pyplot as plt
-from llms.chatglm3.generate import chat_process
+from web_server.function_call.build_function_call_pipline import function_calling
 
 
 def text_analysis(text, top_p, temperature):
 
-    code, response = chat_process(text, top_p, temperature)
+    code, response = function_calling(text, top_p, temperature)
 
     locals_dict = {}
 
