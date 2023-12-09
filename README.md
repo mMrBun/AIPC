@@ -2,6 +2,12 @@
 
 ## Quick Start
 
+Place put the retrieval model in the retriever/retriever_model directory.
+
+|      Model       |                                                              Download                                                              |
+|:----------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
+|   MrBun/ToolRetrieval_IR_bert_based_chinese    |                          [HuggingFace](https://huggingface.co/MrBun/ToolRetrieval_IR_bert_based_chinese)                           |
+
 ```bash
 git clone https://github.com/mMrBun/Chat2BI.git
 
