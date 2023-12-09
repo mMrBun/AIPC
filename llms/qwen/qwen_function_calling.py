@@ -33,7 +33,6 @@ class QwenFunctionCalling:
         planning_prompt = self.build_input_text(chat_history, list_of_plugin_info)
 
         text = ''
-        response_example = ""
         while True:
             output = self.text_completion(planning_prompt + text, stop_words=['Observation:', 'Observation:\n'])
             action, action_input, output = parse_latest_plugin_call(output)
@@ -45,10 +44,7 @@ class QwenFunctionCalling:
 
                 # action、action_input 分别为需要调用的插件代号、输入参数
                 # observation是插件返回的结果，为字符串
-                # observation = call_plugin(action, action_input, tools_callable_path, plugin_info)
-                observation = {
-                    "货值": 78521
-                }
+                observation = call_plugin(action, action_input, tools_callable_path, plugin_info)
 
                 output += f'\nObservation: {observation}\nThought:'
                 text += output
@@ -86,7 +82,6 @@ class QwenFunctionCalling:
 
         # 候选插件的代号
         tools_name_text = ', '.join([plugin_info["name_for_model"] for plugin_info in list_of_plugin_info])
-        # response_example_text = ', '.join([plugin_info["response_example"] for plugin_info in list_of_plugin_info])
 
         im_start = '<|im_start|>'
         im_end = '<|im_end|>'
@@ -98,8 +93,7 @@ class QwenFunctionCalling:
                     query = PROMPT_REACT.format(
                         tools_text=tools_text,
                         tools_name_text=tools_name_text,
-                        query=query,
-                        # response_example=response_example_text
+                        query=query
                     )
             query = query.lstrip('\n').rstrip()  # 重要！若不 strip 会与训练时数据的构造方式产生差异。
             response = response.lstrip('\n').rstrip()  # 重要！若不 strip 会与训练时数据的构造方式产生差异。
@@ -130,15 +124,17 @@ class QwenFunctionCalling:
                 output = output[: idx + len(stop_str)]
         return output  # 续写 input_text 的结果，不包含 input_text 的内容
 
-    def do_chat(self, query: str, history: List[dict], tools_description_path, tools_callable_path):
+    def do_chat(self, query: str, history: List[dict],top_p, temperature, tools_description_path, tools_callable_path):
         tools_description_path = format_qwen_tools_schema(tools_description_path)
         if len(history) > 1:
             history = history[-1:]
         print(f"User's Query:\n{query}\n")
-        response, history = self.llm_with_plugin(prompt=query, history=history,
-                                                            list_of_plugin_info=tools_description_path,
-                                                            tools_callable_path=tools_callable_path)
+        response, history = self.llm_with_plugin(prompt=query,
+                                                 history=history,
+                                                 list_of_plugin_info=tools_description_path,
+                                                 tools_callable_path=tools_callable_path)
         return response, history
+
 
 def parse_latest_plugin_call(text):
     plugin_name, plugin_args = '', ''

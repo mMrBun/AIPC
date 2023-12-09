@@ -8,11 +8,12 @@ from huggingface_hub.inference._text_generation import TextGenerationStreamRespo
 import torch
 from transformers import AutoModel, AutoTokenizer, AutoConfig
 
+from configs import CHATGLM3_MODEL_PATH
 from .conversation import Conversation
 
 TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following core:'
 
-MODEL_PATH = os.environ.get('MODEL_PATH', '/data/models/llm/chatglm3-6b')
+MODEL_PATH = os.environ.get('MODEL_PATH', CHATGLM3_MODEL_PATH)
 PT_PATH = os.environ.get('PT_PATH', None)
 TOKENIZER_PATH = os.environ.get("TOKENIZER_PATH", MODEL_PATH)
 
@@ -31,7 +32,7 @@ class Client(Protocol):
                         ) -> Iterable[TextGenerationStreamResponse]:
         ...
 
-    def generate_chat(self, query, history, role=None):
+    def generate_chat(self, query, history, top_p, temperature, role=None):
         ...
 
     def format_glm_tools_schema(self, list_of_plugin_info):
@@ -174,37 +175,38 @@ class HFClient(Client):
                 )
             )
 
-    def generate_chat(self, query, history, role="user"):
-        return self.model.chat(tokenizer=self.tokenizer, query=query, history=history, role=role)
-
+    def generate_chat(self, query, history, top_p, temperature, role="user"):
+        return self.model.chat(tokenizer=self.tokenizer, top_p=top_p, temperature=temperature, query=query, history=history, role=role)
 
     def format_glm_tools_schema(self, list_of_plugin_info):
-        new_list_plugin_info = []
+        tools = []
         for item in list_of_plugin_info:
-            item['name_for_human'] = item.pop('tool_name')
-            item['name_for_model'] = item.pop('api_name')
-            item['description_for_model'] = item.pop('api_description')
-            item['parameters'] = []
-            item['response'] = []
-            required_parameters = item.pop('required_parameters')
-            optional_parameters = item.pop('optional_parameters')
-            for param in required_parameters:
-                param_entity = {
-                    "name": param.get("name"),
-                    "type": param.get("type"),
-                    "description": param.get("description"),
-                    "required": True
+            # 创建新的JSON结构
+            transformed_json = {
+                "name": item["api_name"],
+                "description": item["api_description"],
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
                 }
-                item['parameters'].append(param_entity)
-            for param in optional_parameters:
-                param_entity = {
-                    "name": param.get("name"),
-                    "type": param.get("type"),
-                    "description": param.get("description"),
-                    "required": False
+            }
+
+            # 处理必需参数
+            for param in item["required_parameters"]:
+                # 在properties中添加参数
+                transformed_json["parameters"]["properties"][param["name"]] = {
+                    "description": param["description"]
                 }
-                item['parameters'].append(param_entity)
-            new_list_plugin_info.append(item)
-        return new_list_plugin_info
+                # 在required列表中添加参数名
+                transformed_json["parameters"]["required"].append(param["name"])
 
-
+            # 处理可选参数
+            for param in item["optional_parameters"]:
+                # 在properties中添加参数
+                transformed_json["parameters"]["properties"][param["name"]] = {
+                    "description": param["description"]
+                }
+                # 可选参数不需要添加到required列表中
+            tools.append(transformed_json)
+        return tools

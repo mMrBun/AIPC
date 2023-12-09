@@ -5,3 +5,8 @@ ipython
 sentencepiece
 sentence_transformers
 pyecharts
+fastapi==0.103.1
+tiktoken
+einops
+transformers_stream_generator
+accelerate

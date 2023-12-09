@@ -1,7 +1,10 @@
+import gc
 from typing import Any, List
 
 import pydantic
 from typing import List, Optional
+
+import torch
 from pydantic import BaseModel, Field, HttpUrl
 
 
@@ -60,8 +63,6 @@ class Tool(BaseModel):
 
 
 class Project(BaseModel):
-    tenant_id: int
-    project_id: int
     project_name: str
     tools: List[Tool]
 
@@ -70,4 +71,24 @@ class Projects(BaseModel):
     projects: List[Project]
 
 
+def torch_gc():
+    try:
+        if torch.cuda.is_available():
+            # 删除模型和优化器的引用
+            # 例如: del model, optimizer
 
+            # 清空PyTorch的CUDA缓存
+            torch.cuda.empty_cache()
+            # 收集CUDA垃圾
+            torch.cuda.ipc_collect()
+            # 强制进行一次垃圾回收
+            gc.collect()
+        elif torch.backends.mps.is_available():
+            try:
+                from torch.mps import empty_cache
+                empty_cache()
+                gc.collect()
+            except Exception as e:
+                print("Error clearing MPS cache:", e)
+    except Exception as e:
+        print("An error occurred during torch_gc:", e)

@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import re
@@ -5,7 +6,7 @@ import shutil
 import string
 import tempfile
 
-from configs import BASE_PATH
+from configs import BASE_PATH, MODEL_INIT_CONFIG
 
 
 def format_swagger_doc(json_data):
@@ -112,7 +113,7 @@ def {camel_to_snake(str(api_path).split('/')[-1])}({req_header_params_str}{req_q
     return json.loads(response.text)
 """
         api_file_path = os.path.join(category_path, "api.py")
-        with open(api_file_path, 'w') as api_file:
+        with open(api_file_path, 'w', encoding='utf-8') as api_file:
             api_file.write(api_file_content)
 
         print(f"API written to {api_file_path}")
@@ -124,17 +125,17 @@ def add_api_to_tsv(api_list, project_name):
     if not os.path.exists(target_path):
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         if not os.path.exists(target_path):
-            with open(target_path, 'a') as file:
+            with open(target_path, 'a', encoding='utf-8') as file:
                 pass  # 空语句，不写入内容
             print(f"File '{target_path}' created.")
         else:
             print(f"File '{target_path}' already exists. Skipping creation.")
 
-    with open(target_path, 'r') as file:
+    with open(target_path, 'r', encoding='utf-8') as file:
         file_content = file.read()
 
     if file_content.strip():  # file content not null
-        with open(target_path, 'a') as file:
+        with open(target_path, 'a', encoding='utf-8') as file:
             last_count = get_last_count(target_path)
             count = last_count + 1
             write_to_tsv(
@@ -203,9 +204,14 @@ def add_api_to_json(project_name, tags, api_list):
                 api_demo_json['api_list'].append(api_info)  # 将api_info添加到api_list中
 
         # 创建project_name.json文件并写入api_demo_json内容
-        json_file_path = os.path.join(target_path, f"{tag['name'].lower()}.json")
-        with open(json_file_path, 'w', encoding='utf-8') as json_file:
-            json.dump(api_demo_json, json_file, indent=4, ensure_ascii=False)  # 格式化写入，缩进为4个空格
+        json_file_path = os.path.join(target_path, f"aaa.json")
+        # json_file_path = os.path.join(target_path, f"{tag['name'].lower()}.json")
+        try:
+
+            with open(json_file_path, 'w', encoding='utf-8') as json_file:
+                json.dump(api_demo_json, json_file, indent=4, ensure_ascii=False)  # 格式化写入，缩进为4个空格
+        except Exception as e:
+            print(e)
 
 
 def camel_to_snake(name):
@@ -248,7 +254,7 @@ def write_to_tsv(api_list, count, file, project_name):
 
 def get_last_count(target_path):
     last_line = None
-    with open(target_path, 'r') as file:
+    with open(target_path, 'r', encoding='utf-8') as file:
         for line in file:
             last_line = line
     if last_line:
@@ -269,8 +275,8 @@ def remove_punctuation(inp_string):
 
 
 def get_tsv_callable_path():
-    tsv_path = os.path.join(BASE_PATH, "retrieval/G1")
-    tool_root_dir = os.path.join(BASE_PATH, "toolenv/tools")
+    tsv_path = os.path.join(BASE_PATH, "functions/retrieval/G1/corpus.tsv")
+    tool_root_dir = os.path.join(BASE_PATH, "functions/toolenv/tools")
     return tsv_path, tool_root_dir
 
 
