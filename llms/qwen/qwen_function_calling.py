@@ -39,7 +39,7 @@ class QwenFunctionCalling:
             output = self.text_completion(planning_prompt + text, stop_words=['Observation:', 'Observation:\n'])
             action, action_input, output = parse_latest_plugin_call(output)
             if action:  # 需要调用插件
-                thought, action_info, action_info_input = split_action(output)
+                # thought, action_info, action_info_input = split_action(output)
                 plugin_info = next(
                     ({"category": plugin.get("category_name"), "classification": plugin.get("name_for_human").lower()}
                      for plugin in list_of_plugin_info if plugin.get("name_for_model") == action), {})
