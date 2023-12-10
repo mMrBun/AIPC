@@ -32,6 +32,7 @@ def format_swagger_doc(json_data):
             if tag not in categorized_apis:
                 categorized_apis[tag] = []
             categorized_apis[tag].append({
+                'name': api.name,
                 'method': api.method.upper(),
                 'path': api.url,
                 'summary': api.description,
@@ -92,6 +93,7 @@ def process_api_doc_list(api_list: list, project_name: str):
             api_path = api['path']
             api_summary = api['summary']
             api_parameters = api['parameters']
+            api_name = api['name']
 
             req_header_params_str, req_query_params_str, req_header_params, req_query_params = generate_params(api_parameters['required_parameters'])
             opt_header_params_str, opt_query_params_str, opt_header_params, opt_query_params = generate_params(api_parameters['optional_parameters'], required=False)
@@ -100,7 +102,7 @@ def process_api_doc_list(api_list: list, project_name: str):
 
             api_file_content += f"""
 # {api_summary.split('/')[-1]}
-def {camel_to_snake(str(api_path).split('/')[-1])}({req_header_params_str}{req_query_params_str}{opt_header_params_str}{opt_query_params_str}):
+def {camel_to_snake(api_name)}({req_header_params_str}{req_query_params_str}{opt_header_params_str}{opt_query_params_str}):
     url = "{api_path}"
     headers = {{ 
         {generate_dict(req_header_params, opt_header_params)}
@@ -173,7 +175,7 @@ def add_api_to_json(project_name, tags, api_list):
                 if api['method'].upper() != 'GET':
                     continue
                 api_info = {
-                    "name": camel_to_snake(str(api['path']).split('/')[-1]),
+                    "name": camel_to_snake(api['name']),
                     "url": str(api['path']),
                     "description": api['summary'].split('/')[-1],
                     "method": api['method'].upper(),
@@ -204,8 +206,8 @@ def add_api_to_json(project_name, tags, api_list):
                 api_demo_json['api_list'].append(api_info)  # 将api_info添加到api_list中
 
         # 创建project_name.json文件并写入api_demo_json内容
-        json_file_path = os.path.join(target_path, f"aaa.json")
-        # json_file_path = os.path.join(target_path, f"{tag['name'].lower()}.json")
+        # json_file_path = os.path.join(target_path, f"aaa.json")
+        json_file_path = os.path.join(target_path, f"{tag['name'].lower()}.json")
         try:
 
             with open(json_file_path, 'w', encoding='utf-8') as json_file:
@@ -229,6 +231,7 @@ def write_to_tsv(api_list, count, file, project_name):
             if api_method.upper() != 'GET':
                 continue
             api_path = str(api['path'])
+            api_name = api['name']
             api_summary = api['summary']
             api_parameters = api['parameters']
             req_params = api_parameters['required_parameters']
@@ -247,7 +250,7 @@ def write_to_tsv(api_list, count, file, project_name):
                 opt_param_list.append(
                     f"""{{""name"": ""{re.sub("-", "_", opt_param.name)}"", ""type"": ""{opt_param.type_}"", ""description"": ""{opt_param.description}"", ""default"": ""null""}}""")
 
-            record = f"""{count}\t"{{""category_name"": ""{project_name}"",""tool_name"": ""{tool['category']}"",""api_name"": ""{camel_to_snake(api_path.split('/')[-1])}"",""api_description"": ""{remove_punctuation(api_summary.split('/')[-1])}"",""required_parameters"": {[', '.join(req_param_list)]},""optional_parameters"": {[', '.join(opt_param_list)]},""method"": ""{api_method.upper()}"",""template_response"":{tr_list}}}\""""
+            record = f"""{count}\t"{{""category_name"": ""{project_name}"",""tool_name"": ""{tool['category']}"",""api_name"": ""{camel_to_snake(api_name)}"",""api_description"": ""{remove_punctuation(api_summary.split('/')[-1])}"",""required_parameters"": {[', '.join(req_param_list)]},""optional_parameters"": {[', '.join(opt_param_list)]},""method"": ""{api_method.upper()}"",""template_response"":{tr_list}}}\""""
             file.write(record.replace("'", "") + '\n')
             count += 1
 

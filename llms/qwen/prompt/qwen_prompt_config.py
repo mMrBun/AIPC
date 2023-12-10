@@ -18,3 +18,47 @@ Final Answer: the final answer to the original input question
 Begin!
 
 Question: {query}"""
+
+ECHARTS_PROMPT = """
+请根据给定的JSON Schema示例和API返回的数据，将其转化为一下示例中的一个JSON数据。
+柱状图JSON Schema示例：
+{
+  "chart_type": "bar",
+  "data": {
+    "categories": ["category1", "category2", "category3"],
+    "series": [
+      {
+        "name": "商家A",
+        "data": [value1, value2, value3]
+      }
+    ]
+  }
+}
+饼图JSON Schema示例：
+{
+  "chart_type": "pie",
+  "data": {
+    "series": [
+      {"name": "category1", "value": value1},
+      {"name": "category2", "value": value2},
+      {"name": "category3", "value": value3}
+    ]
+  }
+}
+折线图JSON Schema示例：
+{
+  "chart_type": "line",
+  "data": {
+    "categories": ["category1", "category2", "category3"],
+    "series": [
+      {
+        "name": "商家A",
+        "data": [value1, value2, value3]
+      }
+    ]
+  }
+}
+API返回的数据：
+{observation}
+请将上述API返回的数据转换为适合柱状图的JSON数据。
+"""

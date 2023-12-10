@@ -11,7 +11,8 @@ from transformers.generation import GenerationConfig
 from configs import QWEN_MODEL_PATH
 
 from core.decorator.class_decorator import singleton
-from .prompt.qwen_prompt_config import TOOL_DESC, PROMPT_REACT
+from web_server.build_charts.format_echarts import EchartsBuilder
+from .prompt.qwen_prompt_config import TOOL_DESC, PROMPT_REACT, ECHARTS_PROMPT
 
 
 @singleton
@@ -33,6 +34,7 @@ class QwenFunctionCalling:
         planning_prompt = self.build_input_text(chat_history, list_of_plugin_info)
 
         text = ''
+        last_observation = ""
         while True:
             output = self.text_completion(planning_prompt + text, stop_words=['Observation:', 'Observation:\n'])
             action, action_input, output = parse_latest_plugin_call(output)
@@ -45,7 +47,7 @@ class QwenFunctionCalling:
                 # action、action_input 分别为需要调用的插件代号、输入参数
                 # observation是插件返回的结果，为字符串
                 observation = call_plugin(action, action_input, tools_callable_path, plugin_info)
-
+                last_observation = observation
                 output += f'\nObservation: {observation}\nThought:'
                 text += output
             else:  # 生成结束，并且不再需要调用插件
@@ -55,8 +57,22 @@ class QwenFunctionCalling:
         new_history = []
         new_history.extend(history)
         new_history.append({'user': prompt, 'bot': text})
-
+        # todo 处理图表代码
+        # chart_code = self.create_echarts_code(last_observation)
         return text, new_history
+
+    def create_echarts_code(self, observation):
+        echarts_prompt = ECHARTS_PROMPT.format(
+            observation=observation
+        )
+        output = self.model.generate(query=echarts_prompt, tokenizer=self.tokenizer, history=[])
+        output = json.loads(output)
+        chart_type = output.get("chart_type")
+        category = output.get("category")
+        data = output.get("series")
+        chart_builder = EchartsBuilder(category, data)
+        code = chart_builder.build_chart(chart_type)
+        return code
 
     # 将对话历史、插件信息聚合成一段初始文本
     def build_input_text(self, chat_history, list_of_plugin_info) -> str:
@@ -124,7 +140,7 @@ class QwenFunctionCalling:
                 output = output[: idx + len(stop_str)]
         return output  # 续写 input_text 的结果，不包含 input_text 的内容
 
-    def do_chat(self, query: str, history: List[dict],top_p, temperature, tools_description_path, tools_callable_path):
+    def do_chat(self, query: str, history: List[dict], top_p, temperature, tools_description_path, tools_callable_path):
         tools_description_path = format_qwen_tools_schema(tools_description_path)
         if len(history) > 1:
             history = history[-1:]
@@ -215,3 +231,6 @@ def split_action(output):
     action_input = parts[2]
 
     return thought, action, action_input
+
+
+

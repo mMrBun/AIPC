@@ -44,57 +44,54 @@ json_interface = gr.Interface(
     outputs="text",
     live=False,
     examples=["""
-    {
-            "projects": [{
-                "project_name": "接口测试",
-                "tools": [{
-                    "tool_name": "bbb",
-                    "api_list": [{
-                        "method": "GET",
-                        "optional_parameters": [],
-                        "test_endpoint": {},
-                        "name": "www",
-                        "description": "www",
-                        "required_parameters": [],
-                        "url": "https://xxx"
-                    }, {
-                        "method": "GET",
-                        "optional_parameters": [],
-                        "test_endpoint": {},
-                        "name": "qqq",
-                        "description": "qqq",
-                        "required_parameters": [],
-                        "url": "https://xxx"
-                    }],
-                    "tool_description": "出口退税大盘",
-                    "standardized_name": "",
-                    "title": "出口退税大盘"
-                }, {
-                    "tool_name": "aaa",
-                    "api_list": [{
-                        "method": "GET",
-                        "optional_parameters": [],
-                        "test_endpoint": {
-                            "a": "aa"
-                        },
-                        "name": "aaa",
-                        "description": "aaa",
-                        "required_parameters": [{
-                            "default": "",
-                            "in": "Query",
-                            "name": "id",
-                            "description": "aa",
-                            "type": "string",
-                            "required": "true"
-                        }],
-                        "url": "https://xxx"
-                    }],
-                    "tool_description": "aaa",
-                    "standardized_name": "",
-                    "title": "aaa"
-                }]
-            }]
-        }
+        {
+        "projects": [
+            {
+                "project_name": "财务类接口",
+                "tools": [
+                    {
+                        "tool_name": "个人财务api",
+                        "api_list": [
+                            {
+                                "method": "GET",
+                                "optional_parameters": [],
+                                "test_endpoint": {
+                                    "1月": 569.23,
+                                    "2月": 460.74,
+                                    "3月": 541.36,
+                                    "4月": 682.78,
+                                    "5月": 159.35,
+                                    "6月": 357.12,
+                                    "7月": 852.46,
+                                    "8月": 741.32,
+                                    "9月": 369.54,
+                                    "10月": 523.98,
+                                    "11月": 412.69,
+                                    "12月": 785.95
+                                },
+                                "name": "get_annual_bill",
+                                "description": "获取个人支付宝年度账单",
+                                "required_parameters": [
+                                    {
+                                        "default": "2023",
+                                        "in": "Query",
+                                        "name": "year",
+                                        "description": "年份 e.g. 2022, 2023",
+                                        "type": "string",
+                                        "required": "true"
+                                    }
+                                ],
+                                "url": "https://xxx"
+                            }
+                        ],
+                        "tool_description": "个人财务相关api",
+                        "standardized_name": "",
+                        "title": "财务类接口"
+                    }
+                ]
+            }
+        ]
+    }
     """
 
               ]
