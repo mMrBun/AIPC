@@ -57,9 +57,8 @@ class QwenFunctionCalling:
         new_history = []
         new_history.extend(history)
         new_history.append({'user': prompt, 'bot': text})
-        # todo 处理图表代码
-        # chart_code = self.create_echarts_code(last_observation)
-        return text, new_history
+        chart_code = self.create_echarts_code(last_observation)
+        return text, chart_code, new_history
 
     def create_echarts_code(self, observation):
         echarts_prompt = ECHARTS_PROMPT.format(
@@ -68,10 +67,11 @@ class QwenFunctionCalling:
         output = self.model.generate(query=echarts_prompt, tokenizer=self.tokenizer, history=[])
         output = json.loads(output)
         chart_type = output.get("chart_type")
-        category = output.get("category")
-        data = output.get("series")
+        category = output.get("data").get("categories")
+        data = output.get("data").get("series")
         chart_builder = EchartsBuilder(category, data)
         code = chart_builder.build_chart(chart_type)
+
         return code
 
     # 将对话历史、插件信息聚合成一段初始文本
@@ -145,11 +145,11 @@ class QwenFunctionCalling:
         if len(history) > 1:
             history = history[-1:]
         print(f"User's Query:\n{query}\n")
-        response, history = self.llm_with_plugin(prompt=query,
-                                                 history=history,
-                                                 list_of_plugin_info=tools_description_path,
-                                                 tools_callable_path=tools_callable_path)
-        return response, history
+        response, code, history = self.llm_with_plugin(prompt=query,
+                                                       history=history,
+                                                       list_of_plugin_info=tools_description_path,
+                                                       tools_callable_path=tools_callable_path)
+        return response, code,  history
 
 
 def parse_latest_plugin_call(text):
@@ -231,6 +231,3 @@ def split_action(output):
     action_input = parts[2]
 
     return thought, action, action_input
-
-
-

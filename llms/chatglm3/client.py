@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterable
 import os
 from typing import Any, Protocol, List
@@ -9,7 +10,9 @@ import torch
 from transformers import AutoModel, AutoTokenizer, AutoConfig
 
 from configs import CHATGLM3_MODEL_PATH
+from web_server.build_charts.format_echarts import EchartsBuilder
 from .conversation import Conversation
+from ..qwen.prompt.qwen_prompt_config import ECHARTS_PROMPT
 
 TOOL_PROMPT = 'Answer the following questions as best as you can. You have access to the following core:'
 
@@ -36,6 +39,9 @@ class Client(Protocol):
         ...
 
     def format_glm_tools_schema(self, list_of_plugin_info):
+        ...
+
+    def create_echarts_code(self, observation):
         ...
 
 
@@ -176,7 +182,8 @@ class HFClient(Client):
             )
 
     def generate_chat(self, query, history, top_p, temperature, role="user"):
-        return self.model.chat(tokenizer=self.tokenizer, top_p=top_p, temperature=temperature, query=query, history=history, role=role)
+        return self.model.chat(tokenizer=self.tokenizer, top_p=top_p, temperature=temperature, query=query,
+                               history=history, role=role)
 
     def format_glm_tools_schema(self, list_of_plugin_info):
         tools = []
@@ -210,3 +217,16 @@ class HFClient(Client):
                 # 可选参数不需要添加到required列表中
             tools.append(transformed_json)
         return tools
+
+    def create_echarts_code(self, observation):
+        echarts_prompt = ECHARTS_PROMPT.format(
+            observation=observation
+        )
+        output = self.model.generate(query=echarts_prompt, tokenizer=self.tokenizer, history=[])
+        output = json.loads(output)
+        chart_type = output.get("chart_type")
+        category = output.get("data").get("categories")
+        data = output.get("data").get("series")
+        chart_builder = EchartsBuilder(category, data)
+        code = chart_builder.build_chart(chart_type)
+        return code

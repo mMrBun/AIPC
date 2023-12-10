@@ -31,12 +31,10 @@ def function_calling(
     model_class = get_model_class(model_type)
     class_instance = model_class()
 
-    response, history = class_instance.do_chat(query=query,
-                                               history=[],
-                                               top_p=top_p,
-                                               temperature=temperature,
-                                               tools_description_path=api_list,
-                                               tools_callable_path=tool_root_dir)
-
-    # return BaseResponse(code=200, msg="工具调用完毕", data={"response": response, "history": history})
-    return response, history
+    response, code, history = class_instance.do_chat(query=query,
+                                                     history=[],
+                                                     top_p=top_p,
+                                                     temperature=temperature,
+                                                     tools_description_path=api_list,
+                                                     tools_callable_path=tool_root_dir)
+    return response, code, history

@@ -1,69 +1,215 @@
-from pyecharts.charts import Bar
-from pyecharts.charts import Pie
-from pyecharts.charts import Line
-from pyecharts import options as opts
-# 创建折线图
-# line = (
-#     Line()
-#     .add_xaxis(["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"])  # X 轴数据
-#     .add_yaxis("商家A", [5, 20, 36, 10, 75, 90])  # Y 轴数据
-#     .set_global_opts(title_opts=opts.TitleOpts(title="折线图示例"))  # 全局配置项
-# )
-#
-# # 渲染图表到文件
-# line.render('line_chart.html')
+import re
 
+string = """
+var option_5533c880c6504289bf2be76d8c6b2e89 = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "color": [
+        "#5470c6",
+        "#91cc75",
+        "#fac858",
+        "#ee6666",
+        "#73c0de",
+        "#3ba272",
+        "#fc8452",
+        "#9a60b4",
+        "#ea7ccc"
+    ],
+    "series": [
+        {
+            "type": "line",
+            "name": "\u6d88\u8d39\u91d1\u989d",
+            "connectNulls": false,
+            "xAxisIndex": 0,
+            "symbolSize": 4,
+            "showSymbol": true,
+            "smooth": false,
+            "clip": true,
+            "step": false,
+            "data": [
+                [
+                    "1\u6708",
+                    569.23
+                ],
+                [
+                    "2\u6708",
+                    460.74
+                ],
+                [
+                    "3\u6708",
+                    541.36
+                ],
+                [
+                    "4\u6708",
+                    682.78
+                ],
+                [
+                    "5\u6708",
+                    159.35
+                ],
+                [
+                    "6\u6708",
+                    357.12
+                ],
+                [
+                    "7\u6708",
+                    852.46
+                ],
+                [
+                    "8\u6708",
+                    741.32
+                ],
+                [
+                    "9\u6708",
+                    369.54
+                ],
+                [
+                    "10\u6708",
+                    523.98
+                ],
+                [
+                    "11\u6708",
+                    412.69
+                ],
+                [
+                    "12\u6708",
+                    785.95
+                ]
+            ],
+            "hoverAnimation": true,
+            "label": {
+                "show": true,
+                "margin": 8
+            },
+            "logBase": 10,
+            "seriesLayoutBy": "column",
+            "lineStyle": {
+                "show": true,
+                "width": 1,
+                "opacity": 1,
+                "curveness": 0,
+                "type": "solid"
+            },
+            "areaStyle": {
+                "opacity": 0
+            },
+            "zlevel": 0,
+            "z": 0
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u6d88\u8d39\u91d1\u989d"
+            ],
+            "selected": {}
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "textStyle": {
+            "fontSize": 14
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            },
+            "data": [
+                "1\u6708",
+                "2\u6708",
+                "3\u6708",
+                "4\u6708",
+                "5\u6708",
+                "6\u6708",
+                "7\u6708",
+                "8\u6708",
+                "9\u6708",
+                "10\u6708",
+                "11\u6708",
+                "12\u6708"
+            ]
+        }
+    ],
+    "yAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            }
+        }
+    ]
+};
+"""
 
+# 构建正则表达式以匹配变量名和它的值
+# 这里假设值是一个对象，由大括号包裹
+pattern = r'var option_([a-f0-9]{32}) = \{(.*?)\};'
 
-# 创建饼图
-pie = (
-    Pie()
-    .add("", [("衬衫", 10), ("羊毛衫", 20), ("雪纺衫", 30), ("裤子", 40), ("高跟鞋", 50), ("袜子", 60)])  # 数据项
-    .set_global_opts(title_opts=opts.TitleOpts(title="饼图示例"))  # 全局配置项
-    .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))  # 系列配置项
-)
+# 使用正则表达式搜索字符串内容
+matches = re.findall(pattern, string, re.DOTALL)
 
-# 渲染图表到文件
-pie.render('pie_chart.html')
-
-# class EchartsBuilder:
-#     def __init__(self, x_axis, y_axis):
-#         self.x_axis = x_axis
-#         self.y_axis = y_axis
-#
-#     def build(self):
-#         bar = Bar()
-#         bar.add_xaxis(self.x_axis)
-#         bar.add_yaxis(self.y_axis)
-#         return bar.render_embed()
-#
-#
-# if __name__ == '__main__':
-#     x_axis = ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-#     y_axis = [5, 20, 36, 10, 75, 90]
-#     builder = EchartsBuilder(x_axis, y_axis)
-#     charts_html_code = builder.build()
-#     print(charts_html_code)
-
-# from pyecharts.charts import Bar
-# from pyecharts import options as opts
-#
-# # V1 版本开始支持链式调用
-# # 你所看到的格式其实是 `black` 格式化以后的效果
-# # 可以执行 `pip install black` 下载使用
-# bar = (
-#     Bar()
-#     .add_xaxis(["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"])
-#     .add_yaxis("商家A", [5, 20, 36, 10, 75, 90])
-#     .set_global_opts(title_opts=opts.TitleOpts(title="主标题", subtitle="副标题"))
-#     # 或者直接使用字典参数
-#     # .set_global_opts(title_opts={"text": "主标题", "subtext": "副标题"})
-# )
-# bar.render()
-#
-# # 不习惯链式调用的开发者依旧可以单独调用方法
-# bar = Bar()
-# bar.add_xaxis(["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"])
-# bar.add_yaxis("商家A", [5, 20, 36, 10, 75, 90])
-# bar.set_global_opts(title_opts=opts.TitleOpts(title="主标题", subtitle="副标题"))
-# bar.render()
+# 检查是否找到匹配，并获取值
+if matches:
+    for match in matches:
+        uid, value = match
+        print(f"找到变量: option_{uid}，值为: {{{value}}}")
+else:
+    print("没有找到匹配的JS变量。")

@@ -20,7 +20,7 @@ Begin!
 Question: {query}"""
 
 ECHARTS_PROMPT = """
-请根据给定的JSON Schema示例和API返回的数据，将其转化为一下示例中的一个JSON数据。
+请根据给定的JSON Schema示例和API返回的数据，将其转化为以下示例中的一个。
 柱状图JSON Schema示例：
 {
   "chart_type": "bar",

@@ -2,25 +2,27 @@ import importlib
 import json
 import os
 import importlib.util
+
+from core.decorator.class_decorator import singleton
 from llms.chatglm3.client import get_client
-
-from llms.chatglm3.code_interpreter import main
-from llms.chatglm3.prompt_template import create_prompt, create_system_prompt
-from llms.chatglm3.utils import extract_code
+from llms.chatglm3.prompt_template import create_system_prompt
 
 
+@singleton
 class ChatGLM3FunctionCalling:
 
     def __init__(self):
 
         self.client = get_client()
+        self.last_observation = ""
 
     def model_chat(self, task_query, system_info, top_p, temperature, tools_callable_path, plugin_info):
         model_history = [system_info]
-        model_response, model_history = self.client.generate_chat(task_query, history=model_history, top_p=top_p, temperature=temperature, role="user")
+        model_response, model_history = self.client.generate_chat(task_query, history=model_history, top_p=top_p,
+                                                                  temperature=temperature, role="user")
         return self.run_task(model_response, model_history, top_p, temperature, tools_callable_path, plugin_info)
 
-    def run_task(self, model_response, model_history,top_p, temperature, tools_callable_path, plugin_info):
+    def run_task(self, model_response, model_history, top_p, temperature, tools_callable_path, plugin_info):
         if isinstance(model_response, dict):
             # done 更改工具调用位置
 
@@ -38,9 +40,12 @@ class ChatGLM3FunctionCalling:
             param = model_response.get("parameters")
             # api调用
             func_response = func(**param)
+            self.last_observation = func_response
             result = json.dumps(func_response, ensure_ascii=False)
-            model_response, model_history = self.client.generate_chat(result, history=model_history, top_p=top_p, temperature=temperature, role="observation")
-            model_response, model_history = self.run_task(model_response, model_history,top_p, temperature, tools_callable_path, plugin_info)
+            model_response, model_history = self.client.generate_chat(result, history=model_history, top_p=top_p,
+                                                                      temperature=temperature, role="observation")
+            model_response, model_history = self.run_task(model_response, model_history, top_p, temperature,
+                                                          tools_callable_path, plugin_info)
             return model_response, model_history
         else:
             return model_response, model_history
@@ -50,5 +55,5 @@ class ChatGLM3FunctionCalling:
         tools = self.client.format_glm_tools_schema(tools_description_path)
         tools_system_info = create_system_prompt(tools)
         response, history = self.model_chat(query, tools_system_info, top_p, temperature, tools_callable_path, tools)
-
-        return response, history
+        code = self.client.create_echarts_code(self.last_observation)
+        return response, code, history

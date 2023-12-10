@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 import gradio as gr
@@ -15,9 +16,38 @@ def text_analysis(text, model_type, top_k, top_p, temperature):
 
     torch.cuda.empty_cache()
 
-    response, history = function_calling(text, top_k, top_p, temperature, model_type)
+    response, code, history = function_calling(text, top_k, top_p, temperature, model_type)
 
-    return response, None
+    html = """
+    <head>
+      <title>Awesome-pyecharts</title>
+      <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+    </head>
+
+    <body>
+      <div id="main" style="width: 600px;height:400px;"></div>
+      <script>
+        var myChart = echarts.init(document.getElementById("main"));
+
+        var option = {echarts_code};
+
+        myChart.setOption(option);
+      </script>
+    </body>
+    """
+
+    pattern = r'var option_([a-f0-9]{32}) = \{(.*?)\};'
+
+    matches = re.findall(pattern, code, re.DOTALL)
+    if matches:
+        for match in matches:
+            uid, value = match
+            print(f"找到变量: option_{uid}，值为: {value}")
+            html = html.replace("echarts_code", value)
+    else:
+        print("没有找到匹配的JS变量。")
+
+    return response, f"""<iframe style="width: 100%; height: 480px" srcdoc='{html}'></iframe>"""
 
 
 text_analysis_interface = gr.Interface(
@@ -29,7 +59,7 @@ text_analysis_interface = gr.Interface(
         gr.Slider(0.0, 1.0, 0.8, step=0.01, label="top_p"),
         gr.Slider(0.0, 1.5, 0.95, step=0.01, label="temperature")
     ],
-    outputs=[gr.Textbox(), gr.Plot()],
+    outputs=[gr.Textbox(), gr.HTML()],
     examples=[
         ["我们客户的年龄分布是怎么样的？"],
         ["我们产品的销售量怎么样？"],
