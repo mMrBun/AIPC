@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-Place put the retrieval model in the retriever/retriever_model directory.
+Place the retrieval model in the retriever/retriever_model directory.
 
 |      Model       |                                                              Download                                                              |
 |:----------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
@@ -13,7 +13,7 @@ git clone https://github.com/mMrBun/Chat2BI.git
 
 conda create -n Chat2BI python=3.10
 
-cona activate Chat2BI
+conda activate Chat2BI
 
 cd Chat2BI
 
