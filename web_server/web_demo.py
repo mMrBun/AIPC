@@ -54,7 +54,7 @@ text_analysis_interface = gr.Interface(
     text_analysis,
     inputs=[
         gr.Textbox(placeholder="Enter sentence here..."),
-        gr.Dropdown(["ChatGLM3", "Qwen"], label="模型类型", info="使用ChatGLM或Qwen"),
+        gr.Dropdown(["ChatGLM3效果太差了，建议使用Qwen", "Qwen"], label="模型类型", info="使用ChatGLM或Qwen"),
         gr.Slider(0, 10, 5, step=1, label="top_k", info="检索出多少个最相关的api信息"),
         gr.Slider(0.0, 1.0, 0.8, step=0.01, label="top_p"),
         gr.Slider(0.0, 1.5, 0.95, step=0.01, label="temperature")

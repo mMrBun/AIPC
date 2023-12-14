@@ -20,45 +20,46 @@ Begin!
 Question: {query}"""
 
 ECHARTS_PROMPT = """
-请根据给定的JSON Schema示例和API返回的数据，将其转化为以下示例中的一个。
+Task：你的任务是返回json数据
+Action：下面提供了三种图标的json格式，你需要将API返回的数据转换为其中的一种，其中type_name需要填充为当前数据主题，例如账单数据就是账单A，以此类推
+Goal：只转换一种图表即可，请确保严格按照示例格式进行转换。
 柱状图JSON Schema示例：
-{
-  "chart_type": "bar",
-  "data": {
-    "categories": ["category1", "category2", "category3"],
-    "series": [
-      {
-        "name": "商家A",
-        "data": [value1, value2, value3]
-      }
-    ]
-  }
-}
+{{
+"chart_type": "bar",
+"data": {{
+"categories": ["category1", "category2", "category3"],
+"series": [
+{{
+"name": "type_name",
+"data": [value1, value2, value3]
+}}
+]
+}}
+}}
 饼图JSON Schema示例：
-{
-  "chart_type": "pie",
-  "data": {
-    "series": [
-      {"name": "category1", "value": value1},
-      {"name": "category2", "value": value2},
-      {"name": "category3", "value": value3}
-    ]
-  }
-}
+{{
+"chart_type": "pie",
+"data": {{
+"series": [
+{{"name": "category1", "value": value1}},
+{{"name": "category2", "value": value2}},
+{{"name": "category3", "value": value3}}
+]
+}}
+}}
 折线图JSON Schema示例：
-{
-  "chart_type": "line",
-  "data": {
-    "categories": ["category1", "category2", "category3"],
-    "series": [
-      {
-        "name": "商家A",
-        "data": [value1, value2, value3]
-      }
-    ]
-  }
-}
+{{
+"chart_type": "line",
+"data": {{
+"categories": ["category1", "category2", "category3"],
+"series": [
+{{
+"name": "type_name",
+"data": [value1, value2, value3]
+}}
+]
+}}
+}}
 API返回的数据：
 {observation}
-请将上述API返回的数据转换为适合柱状图的JSON数据。
 """

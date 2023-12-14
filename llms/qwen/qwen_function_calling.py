@@ -12,7 +12,9 @@ from configs import QWEN_MODEL_PATH
 
 from core.decorator.class_decorator import singleton
 from web_server.build_charts.format_echarts import EchartsBuilder
+from web_server.build_tools.utils import extract_code
 from .prompt.qwen_prompt_config import TOOL_DESC, PROMPT_REACT, ECHARTS_PROMPT
+
 
 
 @singleton
@@ -64,7 +66,8 @@ class QwenFunctionCalling:
         echarts_prompt = ECHARTS_PROMPT.format(
             observation=observation
         )
-        output = self.model.generate(query=echarts_prompt, tokenizer=self.tokenizer, history=[])
+        output = self.model.chat(query=echarts_prompt, tokenizer=self.tokenizer, history=[])
+        output = extract_code(output[0])
         output = json.loads(output)
         chart_type = output.get("chart_type")
         category = output.get("data").get("categories")

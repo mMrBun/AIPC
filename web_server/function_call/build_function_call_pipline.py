@@ -1,12 +1,6 @@
-import json
-import tempfile
-
 from fastapi import Body
-from starlette.responses import StreamingResponse
-
 from configs import RETRIEVE_MODEL_PATH
 from retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
-from web_server import BaseResponse
 from web_server.build_tools.utils import get_tsv_callable_path, get_model_class
 
 
