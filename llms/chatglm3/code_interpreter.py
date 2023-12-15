@@ -1,5 +1,5 @@
 from llms.chatglm3.conversation import preprocess_text, Conversation, Role
-from web_server.build_tools.utils import extract_code
+from core.build_tools.utils import extract_code
 
 SYSTEM_PROMPT = ('你是一位智能AI助手，你叫ChatGLM，你连接着一台电脑，但请注意不能联网。在使用Python'
                  '解决任务时，你可以运行代码并得到结果，如果运行结果有错误，你需要尽可能对代码进行改进。你可以处理用户上传到电脑上的文件，文件默认存储路径是/mnt/data/。')

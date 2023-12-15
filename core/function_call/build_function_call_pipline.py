@@ -1,7 +1,8 @@
 from fastapi import Body
 from configs import RETRIEVE_MODEL_PATH
 from retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
-from web_server.build_tools.utils import get_tsv_callable_path, get_model_class
+from core import BaseResponse
+from core.build_tools.utils import get_tsv_callable_path, get_model_class
 
 
 def function_calling(
@@ -31,4 +32,10 @@ def function_calling(
                                                      temperature=temperature,
                                                      tools_description_path=api_list,
                                                      tools_callable_path=tool_root_dir)
-    return response, code, history
+    return BaseResponse(code=200,
+                        msg="工具初始化成功",
+                        data={
+                            "response": response,
+                            "code": code,
+                            "history": history
+                        })

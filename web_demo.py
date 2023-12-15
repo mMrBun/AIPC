@@ -1,14 +1,9 @@
-import os
 import re
-import sys
-
 import gradio as gr
 import torch
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from web_server import build_tools
-from web_server import function_calling
-from web_server import torch_gc
+from core import build_tools
+from core import function_calling
+from core import torch_gc
 
 
 def text_analysis(text, model_type, top_k, top_p, temperature):
@@ -16,7 +11,9 @@ def text_analysis(text, model_type, top_k, top_p, temperature):
 
     torch.cuda.empty_cache()
 
-    response, code, history = function_calling(text, top_k, top_p, temperature, model_type)
+    response_data = function_calling(text, top_k, top_p, temperature, model_type)
+
+    response, code, history = response_data.data.get("response"), response_data.data.get("code"), response_data.data.get("history")
 
     html = """
     <head>

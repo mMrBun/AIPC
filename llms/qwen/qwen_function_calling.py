@@ -11,8 +11,8 @@ from transformers.generation import GenerationConfig
 from configs import QWEN_MODEL_PATH
 
 from core.decorator.class_decorator import singleton
-from web_server.build_charts.format_echarts import EchartsBuilder
-from web_server.build_tools.utils import extract_code
+from core.build_charts.format_echarts import EchartsBuilder
+from core.build_tools.utils import extract_code
 from .prompt.qwen_prompt_config import TOOL_DESC, PROMPT_REACT, ECHARTS_PROMPT
 
 

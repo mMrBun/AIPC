@@ -1,15 +1,16 @@
 from fastapi import Body
 
-from web_server.build_tools.utils import *
-from web_server.utils import Projects, BaseResponse
+from core.build_tools.utils import *
+from core.utils import Projects, BaseResponse
 
 
 def build_tools(
-        tools_info: json = Body(..., description="工具数据")
+        tools_info: Projects = Body(..., description="api信息")
 ) -> BaseResponse:
     try:
-        tools_info = json.loads(tools_info)
-        tools_info = Projects(**tools_info)
+        if isinstance(tools_info, str):
+            tools_info = json.loads(tools_info)
+            tools_info = Projects(**tools_info)
         projects = tools_info.projects
         for project in projects:
             project_name = camel_to_snake(project.project_name)

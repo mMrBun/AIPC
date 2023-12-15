@@ -10,7 +10,7 @@ import torch
 from transformers import AutoModel, AutoTokenizer, AutoConfig
 
 from configs import CHATGLM3_MODEL_PATH
-from web_server.build_charts.format_echarts import EchartsBuilder
+from core.build_charts.format_echarts import EchartsBuilder
 from .conversation import Conversation
 from ..qwen.prompt.qwen_prompt_config import ECHARTS_PROMPT
 

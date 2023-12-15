@@ -1,6 +1,5 @@
 import json
 import os
-import time
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 from retriever import (
