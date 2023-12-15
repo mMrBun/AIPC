@@ -34,5 +34,4 @@ pip install -r requirements.txt
 
 python web_server/web_demo.py
 ```
-
 view the web demo at http://127.0.0.1:7860
