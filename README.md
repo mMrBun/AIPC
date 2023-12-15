@@ -1,5 +1,7 @@
 <div align="center">
 <h1>Chat2BI</h1>
+Chat2BI is an assistant that utilizes large language models to perform extensive tool calls. It can help you retrieve enterprise-level APIs, providing a one-stop service for API invocation, data visualization, and more.
+
 </div>
 
 
@@ -8,9 +10,10 @@
 
 - 2023.12.14 Optimize ECHARTS_PROMPT to improve the success rate of chart rendering. tag:[#5](https://github.com/mMrBun/Chat2BI/issues/5)
 - 2023.12.14 Change `model.generate()` to `model.chat()`. tag:[#6](https://github.com/mMrBun/Chat2BI/issues/6)
+- 2023.12.15 Support api server. tag:[#3](https://github.com/mMrBun/Chat2BI/issues/3)
 
 ## Roadmap
-- [ ] Support api server [#3](https://github.com/mMrBun/Chat2BI/issues/3)
+- [x] Support api server [#3](https://github.com/mMrBun/Chat2BI/issues/3)
 
 
 ## Quick Start
