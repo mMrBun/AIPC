@@ -24,6 +24,8 @@ Place the retrieval model in the retriever/retriever_model directory.
 |:----------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
 |   MrBun/ToolRetrieval_IR_bert_based_chinese    |                          [🤗HuggingFace](https://huggingface.co/MrBun/ToolRetrieval_IR_bert_based_chinese)                           |
 
+
+## Basic Environment
 ```bash
 git clone https://github.com/mMrBun/Chat2BI.git
 
@@ -34,7 +36,17 @@ conda activate Chat2BI
 cd Chat2BI
 
 pip install -r requirements.txt
+```
 
-python web_server/web_demo.py
+## Web Server
+
+```bash
+python web_demo.py
 ```
 view the web demo at http://127.0.0.1:7860
+
+## Api Server
+```bash
+python api_demo.py
+```
+callable api address at http://127.0.0.1:7861
