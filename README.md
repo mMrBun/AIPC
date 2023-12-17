@@ -5,7 +5,7 @@ Chat2BI is an assistant that utilizes large language models to perform extensive
 Flow Chart
 
 [//]: # (![# Chat2BI]&#40;assets/flow_chart.png &#41;)
-<img src="assets/flow_chart.png" alt="Flow Chart" width="900" height="400">
+<img src="assets/flow_chart.png" alt="Flow Chart" width="850" height="400">
 
 
 </div>
