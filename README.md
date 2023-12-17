@@ -2,6 +2,12 @@
 <h1>Chat2BI</h1>
 Chat2BI is an assistant that utilizes large language models to perform extensive tool calls. It can help you retrieve enterprise-level APIs, providing a one-stop service for API invocation, data visualization, and more.
 
+Flow Chart
+
+[//]: # (![# Chat2BI]&#40;assets/flow_chart.png &#41;)
+<img src="assets/flow_chart.png" alt="Flow Chart" width="1000" height="400">
+
+
 </div>
 
 
