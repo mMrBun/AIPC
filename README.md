@@ -25,10 +25,12 @@ Flow Chart
 ## Quick Start
 
 Place the retrieval model in the retriever/retriever_model directory.
+The retrieval model used to train this search engine agent is based on the code from the ToolBench repository. If you are interested in the dataset and training code, you can refer to the source repository.
+[ToolBench/Training Retriever](https://github.com/OpenBMB/ToolBench?tab=readme-ov-file#training-retriever)
 
 |      Model       |                                                              Download                                                              |
 |:----------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-|   MrBun/ToolRetrieval_IR_bert_based_chinese    |                          [🤗HuggingFace](https://huggingface.co/MrBun/ToolRetrieval_IR_bert_based_chinese)                           |
+|   MrBun/ToolRetrieval_IR_bert_based_chinese    |                          [🤗HuggingFace](https://huggingface.co/MrBun/ToolRetrieval_IR_bert_based_chinese)  / [ModelScope](https://modelscope.cn/models/mrsteamedbun/ToolRetrieval_IR_bert_based_chinese/summary)  |
 
 
 ## Basic Environment
