@@ -14,9 +14,11 @@ Flow Chart
 
 ## Changelog
 
-- 2023.12.14 Optimize ECHARTS_PROMPT to improve the success rate of chart rendering. tag:[#5](https://github.com/mMrBun/Chat2BI/issues/5)
-- 2023.12.14 Change `model.generate()` to `model.chat()`. tag:[#6](https://github.com/mMrBun/Chat2BI/issues/6)
+- 2023.12.18 Support download retrieval model from modelscope.
 - 2023.12.15 Support api server. tag:[#3](https://github.com/mMrBun/Chat2BI/issues/3)
+- 2023.12.14 Change `model.generate()` to `model.chat()`. tag:[#6](https://github.com/mMrBun/Chat2BI/issues/6)
+- 2023.12.14 Optimize ECHARTS_PROMPT to improve the success rate of chart rendering. tag:[#5](https://github.com/mMrBun/Chat2BI/issues/5)
+
 
 ## Roadmap
 - [x] Support api server [#3](https://github.com/mMrBun/Chat2BI/issues/3)
