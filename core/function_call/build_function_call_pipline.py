@@ -12,7 +12,7 @@ def function_calling(
         temperature: float = Body(..., description="", examples=[0.9]),
         model_type: str = Body(..., description="模型类型", examples=["ChatGLM3", "Qwen"])
 ):
-    # done 根据tenant_id和project_id获取配置文件路径
+    # done 获取配置文件路径
     corpus_tsv_path, tool_root_dir = get_tsv_callable_path()
     # done 根据问题使用build_retriever做语义相似查询，返回top_k条记录当作大模型的TOOLS
     retrieve_loader = ToolRetrieverLoader(model_path=RETRIEVE_MODEL_PATH)

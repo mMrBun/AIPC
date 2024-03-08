@@ -1,8 +1,8 @@
 import os
 
-CHATGLM3_MODEL_PATH = "D:\\work\\models\\chatglm3-6b"
+CHATGLM3_MODEL_PATH = "THUDM/chatglm3-6b"
 
-QWEN_MODEL_PATH = "/data/models/Qwen-7B-Chat/"
+QWEN_MODEL_PATH = "Qwen/Qwen-7B-Chat"
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
