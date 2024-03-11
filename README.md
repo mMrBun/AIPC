@@ -22,7 +22,9 @@ Flow Chart
 
 ## Roadmap
 - [x] Support api server [#3](https://github.com/mMrBun/Chat2BI/issues/3)
-
+- [ ] Integrate langchain and Openai Function Calling to allow users to focus on implementing logical aspects rather than describing and structuring tools.
+- [ ] Make the configuration retriever an optional feature (for scenarios with fewer tools).
+- [ ] Providing inference services aligning different models with OpenAI Function Calling
 
 ## Quick Start
 
