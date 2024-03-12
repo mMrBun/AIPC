@@ -1,12 +1,14 @@
-transformers==4.30.2
-torch>=2.0
+transformers
+torch
 gradio
 ipython
 sentencepiece
 sentence_transformers
 pyecharts
-fastapi==0.103.1
+fastapi
 tiktoken
 einops
 transformers_stream_generator
 accelerate
+langchain
+langchain-openai
