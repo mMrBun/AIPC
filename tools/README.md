@@ -1,1 +1,3 @@
-**You can define your tools in the "tools" folder. For easier categorization and management, feel free to create sub folders within the "tools" folder. These tools will be loaded when the program starts up.**
+**You can define your tools in the "tools" folder.
+For easier categorization and management, feel free to create sub folders within the "tools" folder.
+These tools will be loaded when the program starts up.**

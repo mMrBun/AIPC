@@ -1,11 +1,10 @@
-transformers
+transformers==4.38.2
 torch
-gradio
 ipython
 sentencepiece
 sentence_transformers
 pyecharts
-fastapi
+fastapi==0.110.0
 tiktoken
 einops
 transformers_stream_generator
