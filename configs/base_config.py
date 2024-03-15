@@ -1,4 +1,4 @@
 import os
 
-CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
-
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TOOLS_DIR = os.path.join(ROOT_PATH, 'tools')
