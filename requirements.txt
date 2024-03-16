@@ -1,5 +1,7 @@
 transformers==4.38.2
-torch
+infinity-emb[torch]==0.0.17
+vllm>=0.3.3
+openai
 ipython
 sentencepiece
 sentence_transformers
@@ -10,4 +12,5 @@ einops
 transformers_stream_generator
 accelerate
 langchain
+sse-starlette
 langchain-openai
