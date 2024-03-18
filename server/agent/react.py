@@ -143,7 +143,7 @@ class ReAct(Agent):
                 return "Failed: answers not found."
 
     def get_stop_word(self) -> str:
-        return "Observation"
+        return "Observ"
 
 
 if __name__ == "__main__":

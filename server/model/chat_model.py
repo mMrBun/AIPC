@@ -35,13 +35,13 @@ class ChatConfig:
     @staticmethod
     def add_cli_args(parser: "ArgumentParser") -> None:
         parser.add_argument("--name", type=str, default='gpt-3.5-turbo')
-        parser.add_argument("--path", type=str, default='/data/models/Qwen-7B-Chat')
+        parser.add_argument("--path", type=str, default='/data/models/chatglm3-6b')
         parser.add_argument("--device", type=list, nargs="+", default=[0])
         parser.add_argument("--port", type=int, default='8011')
         parser.add_argument("--maxlen", type=int, default=2048)
-        parser.add_argument("--agent_type", type=str, choices=list_agents(), default="react")
-        parser.add_argument("--template", type=str, default='server/templates/qwen.jinja')
-        parser.add_argument("--gen_config", type=str, default='server/generation_config/qwen')
+        parser.add_argument("--agent_type", type=str, choices=list_agents(), default="aligned")
+        parser.add_argument("--template", type=str, default='server/templates/chatglm3.jinja')
+        parser.add_argument("--gen_config", type=str, default='server/generation_config/chatglm3')
 
     @classmethod
     def from_cli_args(cls, args: "Namespace") -> Self:
@@ -215,7 +215,7 @@ class ChatModel:
 
         if stop_word is not None:
             stop_token = self._tokenizer.convert_ids_to_tokens(stop_word_id)
-            if generated_text.endswith(stop_token):
+            if generated_text.endswith(str(stop_token)):
                 generated_text = generated_text[: -len(stop_token)]
 
         return self._agent.extract_tool(generated_text, tools), prompt_tokens, completion_tokens

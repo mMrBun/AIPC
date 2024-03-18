@@ -4,6 +4,7 @@ from langchain_community.tools.convert_to_openai import format_tool_to_openai_to
 from langchain.tools import BaseTool
 
 from configs.base_config import TOOLS_DIR
+from server.protocol import ToolCallRequest
 
 
 def collect_tool_classes(path: str):
@@ -27,7 +28,7 @@ def collect_tool_classes(path: str):
     return tool_class_list
 
 
-def get_tools() -> tuple[dict, list]:
+def get_tools(request: ToolCallRequest) -> tuple[dict, list]:
     """
     Get all the tools in the TOOLS_DIR.
     tools_dict: A dictionary of tools, where the key is the tool name and the value is the langchain tool.
@@ -37,8 +38,15 @@ def get_tools() -> tuple[dict, list]:
     toos_list = []
     tool_classes = collect_tool_classes(TOOLS_DIR)
     tools = [tool_class() for tool_class in tool_classes]
+    if request.enable_retriever:
+        # todo load retriever model
+        # todo search tools
+        pass
     for tool in tools:
         tools_dict[tool.name] = tool
         tool_description = format_tool_to_openai_tool(tool)
         toos_list.append(tool_description)
     return tools_dict, toos_list
+
+
+print(get_tools())

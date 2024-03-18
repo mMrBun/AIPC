@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 class WeatherInput(BaseModel):
     location: str = Field(description="Location, city, state.", examples=['beijing', 'Miami'], default="beijing")
-    unit: str = Field(description="Types of temperature", examples=['celsius', 'fahrenheit'], default="fahrenheit")
+    unit: str = Field(description="Types of temperature", examples=['celsius', 'fahrenheit'], default="celsius")
 
 
 class Weather(BaseTool, abc.ABC):

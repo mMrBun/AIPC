@@ -1,0 +1,24 @@
+chat:
+  - name: gpt-3.5-turbo
+    path: /data/models/chatglm3-6b/
+    device:
+      - 0
+    port: 8011
+#  - name: gpt-4
+#    path: 01-ai/Yi-34B-Chat
+#    device:
+#      - 1
+#      - 2
+#    port: 8012
+
+embed:
+  - name: text-embedding-ada-002
+    path: /data/models/bge-large-zh/
+    device:
+      - 0
+    batchsize: 64
+    port: 8013
+
+service:
+  host: 127.0.0.1
+  port: 8010

@@ -83,11 +83,8 @@ class ChatCompletionRequest(BaseModel):
 
 
 class ToolCallRequest(BaseModel):
-    query: str
-    temperature: Optional[float] = 0.01
-    top_p: Optional[float] = 0.5
-    max_tokens: Optional[int] = 2048
-    stream: Optional[bool] = False
+    enable_retriever: bool
+    top_k: Optional[int] = 5
 
 
 class ChatCompletionResponseChoice(BaseModel):

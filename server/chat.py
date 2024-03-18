@@ -13,7 +13,6 @@ from common import create_stream_chunk
 from protocol import (
     ChatCompletionMessage,
     ChatCompletionRequest,
-    ToolCallRequest,
     ChatCompletionResponse,
     ChatCompletionResponseChoice,
     Finish,
@@ -95,20 +94,10 @@ def launch_server(config: "ChatConfig") -> None:
     app = FastAPI()
 
     @app.post('/v1/chat/completions', response_model=ChatCompletionResponse, status_code=status.HTTP_200_OK)
-    async def create_chat_completion(request: "ToolCallRequest"):
-        messages = [{"role": "user", "content": request.query}]
+    async def create_chat_completion(request: "ChatCompletionRequest"):
         tools_dict, tools_list = get_tools()
-        chat_completion_request = ChatCompletionRequest(
-            model=model.name,
-            messages=messages,
-            tools=tools_list,
-            temperature=request.temperature,
-            top_p=request.top_p,
-            n=1,
-            max_tokens=request.max_tokens,
-            stream=request.stream
-        )
-        return await _create_local_chat_completion(chat_completion_request, model)
+        request.tools = tools_list
+        return await _create_local_chat_completion(request, model)
 
     uvicorn.run(app, host='0.0.0.0', port=config.port)
 
