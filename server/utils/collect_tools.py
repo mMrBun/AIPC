@@ -5,6 +5,7 @@ from langchain.tools import BaseTool
 
 from configs.base_config import TOOLS_DIR
 from server.protocol import ToolCallRequest
+from server.retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
 
 
 def collect_tool_classes(path: str):
@@ -40,6 +41,11 @@ def get_tools(request: ToolCallRequest) -> tuple[dict, list]:
     tools = [tool_class() for tool_class in tool_classes]
     if request.enable_retriever:
         # todo load retriever model
+        retrieve_loader = ToolRetrieverLoader(model_path=request.model_path)
+        retrieve_embedder = ToolRetrieverEmbedder(tool_root_dir="tool_root_dir",
+                                                  model_loader_instance=retrieve_loader,
+                                                  corpus_tsv_path="corpus_tsv_path")
+        tools = retrieve_embedder.do_retrieve(query=request.query, top_k=request.top_k)
         # todo search tools
         pass
     for tool in tools:
