@@ -6,7 +6,7 @@ from transformers import AutoTokenizer
 
 async def _generate():
     tokenizer = AutoTokenizer.from_pretrained("/data/models/chatglm3-6b", trust_remote_code=True)
-    with open("../server/templates/chatglm3.jinja", "r", encoding="utf-8") as f:
+    with open("../configs/templates/chatglm3.jinja", "r", encoding="utf-8") as f:
         tokenizer.chat_template = f.read()
     print(tokenizer.eos_token_id)
     print(tokenizer.pad_token_id)

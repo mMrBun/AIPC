@@ -103,6 +103,7 @@ def launch_server(config: "ChatConfig") -> None:
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     ChatConfig.add_cli_args(parser)
     args = parser.parse_args()

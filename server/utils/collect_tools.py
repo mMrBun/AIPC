@@ -3,7 +3,7 @@ import importlib.util
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain.tools import BaseTool
 
-from configs.base_config import TOOLS_DIR
+from configs.base_config import TOOLS_DIR, RETRIEVAL_MODEL_PATH
 from server.protocol import ToolCallRequest
 from server.retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
 
@@ -54,5 +54,5 @@ def retrieval_tools(request: ToolCallRequest):
 
 
 tools_list = get_tools()
-loader = ToolRetrieverLoader(model_path="/data/models/bge-large-zh/")
+loader = ToolRetrieverLoader(model_path=RETRIEVAL_MODEL_PATH)
 embedding = ToolRetrieverEmbedder(model_loader_instance=loader, defined_tools=tools_list)
