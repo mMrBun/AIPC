@@ -84,6 +84,7 @@ class ChatCompletionRequest(BaseModel):
 
 class ToolCallRequest(BaseModel):
     enable_retriever: bool
+    query: str
     top_k: Optional[int] = 5
 
 

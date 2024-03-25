@@ -1,11 +1,11 @@
 import os
 import importlib.util
-from langchain_community.tools.convert_to_openai import format_tool_to_openai_tool
+from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain.tools import BaseTool
 
 from configs.base_config import TOOLS_DIR
 from server.protocol import ToolCallRequest
-from server.retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
+from server.retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
 
 
 def collect_tool_classes(path: str):
@@ -29,30 +29,30 @@ def collect_tool_classes(path: str):
     return tool_class_list
 
 
-def get_tools(request: ToolCallRequest) -> tuple[dict, list]:
+def get_tools() -> tuple[dict, list]:
     """
     Get all the tools in the TOOLS_DIR.
     tools_dict: A dictionary of tools, where the key is the tool name and the value is the langchain tool.
     toos_list: A list of tool's description, where each tool is formatted as an OpenAI tool.
     """
     tools_dict = {}
-    toos_list = []
+    tools_list = []
     tool_classes = collect_tool_classes(TOOLS_DIR)
     tools = [tool_class() for tool_class in tool_classes]
-    if request.enable_retriever:
-        # todo load retriever model
-        retrieve_loader = ToolRetrieverLoader(model_path=request.model_path)
-        retrieve_embedder = ToolRetrieverEmbedder(tool_root_dir="tool_root_dir",
-                                                  model_loader_instance=retrieve_loader,
-                                                  corpus_tsv_path="corpus_tsv_path")
-        tools = retrieve_embedder.do_retrieve(query=request.query, top_k=request.top_k)
-        # todo search tools
-        pass
+
     for tool in tools:
         tools_dict[tool.name] = tool
-        tool_description = format_tool_to_openai_tool(tool)
-        toos_list.append(tool_description)
-    return tools_dict, toos_list
+        tool_description = convert_to_openai_tool(tool)
+        tools_list.append(tool_description)
+
+    return tools_dict, tools_list
 
 
-print(get_tools())
+def retrieval_tools(request: ToolCallRequest):
+    if request.enable_retriever:
+        return embedding.do_retrieve(request.query, request.top_k)
+
+
+tools_list = get_tools()
+loader = ToolRetrieverLoader(model_path="/data/models/bge-large-zh/")
+embedding = ToolRetrieverEmbedder(model_loader_instance=loader, defined_tools=tools_list)
