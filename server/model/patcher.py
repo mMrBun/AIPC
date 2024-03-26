@@ -76,7 +76,7 @@ def _resize_embedding_layer(model: "PreTrainedModel", tokenizer: "PreTrainedToke
 def _get_quantization_dataset(tokenizer: "PreTrainedTokenizer", model_args: "ModelArguments") -> List[str]:
     r"""
     Inspired by: https://github.com/huggingface/optimum/blob/v1.16.0/optimum/gptq/data.py#L133
-    TODO: remove tokenizer.decode() https://github.com/huggingface/optimum/pull/1600
+    
     """
     if os.path.isfile(model_args.export_quantization_dataset):
         data_path = FILEEXT2TYPE.get(model_args.export_quantization_dataset.split(".")[-1], None)
@@ -94,7 +94,7 @@ def _get_quantization_dataset(tokenizer: "PreTrainedTokenizer", model_args: "Mod
             sample_idx = random.randint(0, len(dataset) - 1)
             sample: Dict[str, torch.Tensor] = tokenizer(dataset[sample_idx]["text"], return_tensors="pt")
             if sample["input_ids"].size(1) >= maxlen:
-                break  # TODO: fix large maxlen
+                break
 
         word_idx = random.randint(0, sample["input_ids"].size(1) - maxlen - 1)
         input_ids = sample["input_ids"][:, word_idx : word_idx + maxlen]
