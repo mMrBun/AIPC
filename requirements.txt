@@ -1,6 +1,9 @@
 transformers==4.38.2
 infinity-emb[torch]==0.0.17
 vllm>=0.3.3
+trl
+peft>=0.9.0
+datasets
 openai
 ipython
 sentencepiece

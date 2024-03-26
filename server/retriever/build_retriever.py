@@ -1,3 +1,5 @@
+from typing import List
+
 from sentence_transformers import SentenceTransformer, util
 from .utils import process_retrieval_document
 
@@ -44,6 +46,6 @@ class ToolRetrieverEmbedder:
             retrieved_tools.append(tool)
         return retrieved_tools
 
-    def do_retrieve(self, query, top_k):
+    def do_retrieve(self, query, top_k) -> List[dict]:
         result = self.retrieving(query, top_k=top_k)
         return result

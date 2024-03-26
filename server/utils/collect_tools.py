@@ -4,7 +4,7 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain.tools import BaseTool
 
 from configs.base_config import TOOLS_DIR, RETRIEVAL_MODEL_PATH
-from server.protocol import ToolCallRequest
+from server.api.protocol import ToolCallRequest
 from server.retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
 
 
@@ -50,7 +50,11 @@ def get_tools() -> tuple[dict, list]:
 
 def retrieval_tools(request: ToolCallRequest):
     if request.enable_retriever:
-        return embedding.do_retrieve(request.query, request.top_k)
+        query = request.messages[-1].content
+        tools = embedding.do_retrieve(query, request.top_k)
+        return tools_list[0], tools
+    else:
+        return tools_list
 
 
 tools_list = get_tools()
