@@ -6,7 +6,7 @@ as this can help the model work better.
 """
 import abc
 import json
-from typing import Type
+from typing import Type, Any
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -29,6 +29,7 @@ class Weather(BaseTool, abc.ABC):
     name = "get_current_weather"
     description = "Get the current weather in a given location"
     args_schema: Type[BaseModel] = WeatherInput
+    enabled = False
 
     def __init__(self):
         super().__init__()
@@ -37,6 +38,25 @@ class Weather(BaseTool, abc.ABC):
         """
         Write down the implementation logic for the tool here.
         """
+        if "tokyo" in location.lower():
+            return json.dumps({"location": "Tokyo", "temperature": "10", "unit": unit})
+        elif "san francisco" in location.lower():
+            return json.dumps({"location": "San Francisco", "temperature": "72", "unit": unit})
+        elif "paris" in location.lower():
+            return json.dumps({"location": "Paris", "temperature": "22", "unit": unit})
+        else:
+            return json.dumps({"location": location, "temperature": "unknown"})
+
+    async def _arun(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Write down the implementation logic for the tool here.
+        """
+        location = kwargs.get("location")
+        unit = kwargs.get("unit")
         if "tokyo" in location.lower():
             return json.dumps({"location": "Tokyo", "temperature": "10", "unit": unit})
         elif "san francisco" in location.lower():

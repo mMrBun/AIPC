@@ -666,7 +666,8 @@ _register_template(
     format_system=StringFormatter(slots=["<|im_start|>system\n{{content}}<|im_end|>\n"]),
     format_separator=EmptyFormatter(slots=["\n"]),
     default_system="You are a helpful assistant.",
-    stop_words=["<|im_end|>"],
+    format_tools=ToolFormatter(tool_format="react"),
+    stop_words=["<|im_end|>", "Observ"],
     replace_eos=True,
 )
 

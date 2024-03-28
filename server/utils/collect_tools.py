@@ -41,9 +41,10 @@ def get_tools() -> tuple[dict, list]:
     tools = [tool_class() for tool_class in tool_classes]
 
     for tool in tools:
-        tools_dict[tool.name] = tool
-        tool_description = convert_to_openai_tool(tool)
-        tools_list.append(tool_description)
+        if tool.enabled:
+            tools_dict[tool.name] = tool
+            tool_description = convert_to_openai_tool(tool)
+            tools_list.append(tool_description)
 
     return tools_dict, tools_list
 

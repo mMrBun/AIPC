@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Sequence
@@ -59,6 +60,13 @@ def jsonify(data: "BaseModel") -> str:
         return json.dumps(data.model_dump(exclude_unset=True), ensure_ascii=False)
     except AttributeError:  # pydantic v1
         return data.json(exclude_unset=True, ensure_ascii=False)
+
+
+MAX_RETRIES = 5
+RETRY_EXCEPTIONS = HTTPException
+
+
+
 
 
 def create_app(chat_model: "ChatModel") -> "FastAPI":
@@ -216,14 +224,35 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
         scores = await chat_model.aget_scores(request.messages, max_length=request.max_length)
         return ScoreEvaluationResponse(model=request.model, scores=scores)
 
+    async def process_tool_calls(tool_calls, tools_dict, input_messages):
+        for tool_call in tool_calls:
+            function = tool_call.function
+            input_messages.append(ChatMessage(role=Role.ASSISTANT, content=json.dumps(function.dict())))
+            tool = tools_dict.get(tool_call.function.name)
+            if tool is None:
+                raise HTTPException(status_code=404, detail=f"Tool {tool_call.function.name} not found.")
+
+            try:
+                tool_response = await tool.arun(dict(json.loads(tool_call.function.arguments)))
+                input_messages.append(ChatMessage(role=Role.TOOL, content=tool_response))
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        # return ChatCompletionResponse(messages=input_messages)
+
+    def create_error_message(exception) -> ChatMessage:
+        # 可以选择返回更详细的错误信息
+        return ChatMessage(role=Role.OBSERVATION, content=str(exception)[-20:])
+
     @app.post("/v1/chat/tool/call", response_model=ChatCompletionResponse, status_code=status.HTTP_200_OK)
     async def create_tool_call(request: ToolCallRequest):
         tools_dict, tools_list = retrieval_tools(request)
-        max_retries = 5
         input_messages = request.messages
-        while max_retries > 0:
+        retries_left = MAX_RETRIES
+        prompt_length, response_length = 0, 0
+        while retries_left > 0:
             chat_request = ChatCompletionRequest(
-                model="test",
+                model=request.model,
                 messages=input_messages,
                 tools=tools_list,
                 do_sample=request.do_sample,
@@ -233,22 +262,32 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
                 max_tokens=request.max_tokens,
                 stream=False
             )
-            response = await create_chat_completion(chat_request)
-            tool_calls = response.choices[0].message.tool_calls
-            if tool_calls:
-                for tool_call in tool_calls:
-                    function = tool_call.function
-                    tool = tools_dict.get(function.name)
-                    try:
-                        tool_response = tool.run(dict(json.loads(function.arguments)))
-                        input_messages.append(ChatMessage(role=Role.OBSERVATION, content=tool_response))
-                    except Exception as e:
-                        max_retries -= 1
-                        input_messages.append(ChatMessage(role=Role.OBSERVATION, content=str(e)[-20:]))
-
-            else:
-                return ""
-        return ""
+            try:
+                response = await create_chat_completion(chat_request)
+                prompt_length = response.usage.prompt_tokens
+                response_length += response.usage.completion_tokens
+                message = response.choices[0].message
+                tool_calls = message.tool_calls
+                if tool_calls:
+                    await process_tool_calls(tool_calls, tools_dict, input_messages)
+                else:
+                    return response
+            except RETRY_EXCEPTIONS as e:
+                retries_left -= 1
+                logging.error(e)
+                input_messages.append(ChatMessage(role=Role.OBSERVATION, content=str(e)[-20:]))
+                if retries_left == 0:
+                    choices = [ChatCompletionResponseChoice(
+                        index=0,
+                        message=ChatCompletionMessage(role=Role.ASSISTANT, content="Failed after multiple retries."),
+                        finish_reason=Finish.STOP)
+                    ]
+                    usage = ChatCompletionResponseUsage(
+                        prompt_tokens=prompt_length,
+                        completion_tokens=response_length,
+                        total_tokens=prompt_length + response_length,
+                    )
+                    return ChatCompletionResponse(model=request.model, choices=choices, usage=usage)
 
     return app
 

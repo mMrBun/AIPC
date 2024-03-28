@@ -92,7 +92,7 @@ class VllmEngine(BaseEngine):
             length_penalty=generating_args["length_penalty"],
             stop_token_ids=[self.tokenizer.eos_token_id] + self.tokenizer.additional_special_tokens_ids,
             max_tokens=generating_args["max_new_tokens"],
-            skip_special_tokens=True,
+            skip_special_tokens=False,
         )
         result_generator = self.model.generate(
             prompt=None, sampling_params=sampling_params, request_id=request_id, prompt_token_ids=prompt_ids

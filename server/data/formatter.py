@@ -4,26 +4,15 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Union
 
+from configs.base_config import TOOL_SYSTEM_PROMPT, REACT_SYSTEM_PROMPT, JSON_FORMAT_PROMPT
 
 SLOTS = Sequence[Union[str, Set[str], Dict[str, str]]]
 
 
-JSON_FORMAT_PROMPT = (
-    """, in a JSON format representing the kwargs (e.g. ```{"input": "hello world", "num_beams": 5}```)"""
-)
 
 
-TOOL_SYSTEM_PROMPT = (
-    "You have access to the following tools:\n{tool_text}"
-    "Use the following format if using a tool:\n"
-    "```\n"
-    "Action: tool name (one of [{tool_names}]).\n"
-    "Action Input: the input to the tool{format_prompt}.\n"
-    "```\n"
-)
 
-
-def default_tool_formatter(tools: List[Dict[str, Any]]) -> str:
+def parse_default_tool(tools: List[Dict[str, Any]]) -> Tuple[str, List[str]]:
     tool_text = ""
     tool_names = []
     for tool in tools:
@@ -48,10 +37,21 @@ def default_tool_formatter(tools: List[Dict[str, Any]]) -> str:
         )
         tool_names.append(tool["name"])
 
+    return tool_text, tool_names
+
+
+def default_tool_formatter(tools: List[Dict[str, Any]]):
+    tool_text, tool_names = parse_default_tool(tools)
     return TOOL_SYSTEM_PROMPT.format(
         tool_text=tool_text, tool_names=", ".join(tool_names), format_prompt=JSON_FORMAT_PROMPT
     )
 
+
+def react_tool_formatter(tools: List[Dict[str, Any]]):
+    tool_text, tool_names = parse_default_tool(tools)
+    return REACT_SYSTEM_PROMPT.format(
+        tool_text=tool_text, tool_names=", ".join(tool_names)
+    )
 
 def default_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
     regex = re.compile(r"Action:\s*([a-zA-Z0-9_]+).*?Action Input:\s*(.*)", re.DOTALL)
@@ -72,7 +72,7 @@ def default_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
 @dataclass
 class Formatter(ABC):
     slots: SLOTS = field(default_factory=list)
-    tool_format: Optional[Literal["default"]] = None
+    tool_format: Optional[Literal["default", "react"]] = None
 
     @abstractmethod
     def apply(self, **kwargs) -> SLOTS: ...
@@ -175,6 +175,8 @@ class ToolFormatter(Formatter):
 
             if self.tool_format == "default":
                 return [default_tool_formatter(tools)]
+            elif self.tool_format == "react":
+                return [react_tool_formatter(tools)]
             else:
                 raise NotImplementedError
         except Exception:
@@ -182,6 +184,8 @@ class ToolFormatter(Formatter):
 
     def extract(self, content: str) -> Union[str, Tuple[str, str]]:
         if self.tool_format == "default":
+            return default_tool_extractor(content)
+        elif self.tool_format == "react":
             return default_tool_extractor(content)
         else:
             raise NotImplementedError

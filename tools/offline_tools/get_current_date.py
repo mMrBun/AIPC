@@ -5,6 +5,9 @@ Please describe the parameters and the purpose of the tool in as much detail as 
 as this can help the model work better.
 """
 import abc
+import json
+from typing import Any
+
 from langchain.tools import BaseTool
 
 
@@ -20,6 +23,7 @@ class GetCurrentDate(BaseTool, abc.ABC):
     """
     name = "get_current_date"
     description = "Get the current date"
+    enabled = True
 
     def __init__(self):
         super().__init__()
@@ -31,3 +35,11 @@ class GetCurrentDate(BaseTool, abc.ABC):
         """
         import datetime
         return datetime.datetime.now().strftime("%Y-%m-%d")
+
+    async def _arun(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        import datetime
+        return json.dumps({"time": datetime.datetime.now().strftime("%Y-%m-%d")})
