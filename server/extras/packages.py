@@ -59,3 +59,7 @@ def is_uvicorn_available():
 
 def is_vllm_available():
     return _is_package_available("vllm")
+
+
+def is_pyecharts_available():
+    return _is_package_available("pyecharts")

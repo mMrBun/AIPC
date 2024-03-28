@@ -20,6 +20,7 @@ class GetCurrentDate(BaseTool, abc.ABC):
     This can increase the accuracy of model selection for the right tool.
     🤗args_schema: For the tool input parameters, if possible, please provide a description, examples,
      and default values for each parameter.
+     🤗enabled: If the tool is enabled or not. If the tool is not enabled, it will not be available for use.
     """
     name = "get_current_date"
     description = "Get the current date"
