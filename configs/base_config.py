@@ -4,7 +4,7 @@ ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT_PATH, 'tools')
 
 
-# You can use other embedding models there, such as bge-large-zh, m3e-large, text-2-vector
+# You can use other embedding models there, such as: bge-large-zh, m3e-large, text2vec-base-chinese.
 RETRIEVAL_MODEL_PATH = "MrBun/ToolRetrieval_IR_bert_based_chinese"
 RETRIEVAL_MODEL_ENABLED = False
 
