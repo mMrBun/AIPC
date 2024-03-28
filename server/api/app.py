@@ -238,11 +238,6 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        # return ChatCompletionResponse(messages=input_messages)
-
-    def create_error_message(exception) -> ChatMessage:
-        # 可以选择返回更详细的错误信息
-        return ChatMessage(role=Role.OBSERVATION, content=str(exception)[-20:])
 
     @app.post("/v1/chat/tool/call", response_model=ChatCompletionResponse, status_code=status.HTTP_200_OK)
     async def create_tool_call(request: ToolCallRequest):
@@ -275,7 +270,7 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
             except RETRY_EXCEPTIONS as e:
                 retries_left -= 1
                 logging.error(e)
-                input_messages.append(ChatMessage(role=Role.OBSERVATION, content=str(e)[-20:]))
+                input_messages.append(ChatMessage(role=Role.OBSERVATION, content=str(e)[-40:]))
                 if retries_left == 0:
                     choices = [ChatCompletionResponseChoice(
                         index=0,

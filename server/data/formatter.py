@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Union
 
-from configs.base_config import TOOL_SYSTEM_PROMPT, REACT_SYSTEM_PROMPT, JSON_FORMAT_PROMPT
+from configs.base_config import TOOL_SYSTEM_PROMPT, REACT_SYSTEM_PROMPT, JSON_FORMAT_PROMPT, CHATGLM3_SYSTEM_PROMPT
 
 SLOTS = Sequence[Union[str, Set[str], Dict[str, str]]]
 
@@ -53,6 +53,14 @@ def react_tool_formatter(tools: List[Dict[str, Any]]):
         tool_text=tool_text, tool_names=", ".join(tool_names)
     )
 
+
+def chatglm3_tool_formatter(tools: List[Dict[str, Any]]):
+    tool_text, _ = parse_default_tool(tools)
+    return CHATGLM3_SYSTEM_PROMPT.format(
+        tool_text=tool_text
+    )
+
+
 def default_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
     regex = re.compile(r"Action:\s*([a-zA-Z0-9_]+).*?Action Input:\s*(.*)", re.DOTALL)
     action_match = re.search(regex, content)
@@ -69,10 +77,26 @@ def default_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
     return tool_name, json.dumps(arguments, ensure_ascii=False)
 
 
+def chatglm3_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
+    tool_name = ""
+    arguments = {}
+    for response in content.split("<|assistant|>"):
+        tool_name, arguments = response.split("\n", maxsplit=1)
+        if not tool_name.strip():
+            return content
+        else:
+            arguments = "\n".join(arguments.split("\n")[1:-1])
+
+            def tool_call(**kwargs):
+                return kwargs
+            arguments = eval(arguments)
+
+    return tool_name.strip(), json.dumps(arguments, ensure_ascii=False)
+
 @dataclass
 class Formatter(ABC):
     slots: SLOTS = field(default_factory=list)
-    tool_format: Optional[Literal["default", "react"]] = None
+    tool_format: Optional[Literal["default", "react", "chatglm3"]] = None
 
     @abstractmethod
     def apply(self, **kwargs) -> SLOTS: ...
@@ -177,15 +201,17 @@ class ToolFormatter(Formatter):
                 return [default_tool_formatter(tools)]
             elif self.tool_format == "react":
                 return [react_tool_formatter(tools)]
+            elif self.tool_format == "chatglm3":
+                return [chatglm3_tool_formatter(tools)]
             else:
                 raise NotImplementedError
         except Exception:
             return [""]
 
     def extract(self, content: str) -> Union[str, Tuple[str, str]]:
-        if self.tool_format == "default":
+        if self.tool_format == "default" or self.tool_format == "react":
             return default_tool_extractor(content)
-        elif self.tool_format == "react":
-            return default_tool_extractor(content)
+        elif self.tool_format == "chatglm3":
+            return chatglm3_tool_extractor(content)
         else:
             raise NotImplementedError

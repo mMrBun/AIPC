@@ -84,7 +84,7 @@ class Template:
             elements = []
             if i == 0 and (system or tools or self.force_system):
                 tool_text = self.format_tools.apply(content=tools)[0] if tools else ""
-                elements += self.format_system.apply(content=(system + tool_text))
+                elements += self.format_system.apply(content=(system + tool_text) if tool_text == "" else tool_text)
             elif i > 0 and i % 2 == 0:
                 elements += self.format_separator.apply()
 
@@ -460,12 +460,10 @@ _register_template(
     format_observation=StringFormatter(
         slots=[{"token": "<|observation|>"}, "\n", "{{content}}", {"token": "<|assistant|>"}]
     ),
+    format_tools=ToolFormatter(tool_format="chatglm3"),
     stop_words=["<|user|>", "<|observation|>"],
     efficient_eos=True,
-    force_system=True,
-    default_system=(
-        "Answer the following questions as best as you can. You have access to the following tools:"
-    )
+    force_system=True
 )
 
 
