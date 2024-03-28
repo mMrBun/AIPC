@@ -9,9 +9,6 @@ from configs.base_config import TOOL_SYSTEM_PROMPT, REACT_SYSTEM_PROMPT, JSON_FO
 SLOTS = Sequence[Union[str, Set[str], Dict[str, str]]]
 
 
-
-
-
 def parse_default_tool(tools: List[Dict[str, Any]]) -> Tuple[str, List[str]]:
     tool_text = ""
     tool_names = []
@@ -89,9 +86,11 @@ def chatglm3_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
 
             def tool_call(**kwargs):
                 return kwargs
+
             arguments = eval(arguments)
 
     return tool_name.strip(), json.dumps(arguments, ensure_ascii=False)
+
 
 @dataclass
 class Formatter(ABC):

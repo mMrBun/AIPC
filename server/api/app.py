@@ -66,9 +66,6 @@ MAX_RETRIES = 5
 RETRY_EXCEPTIONS = HTTPException
 
 
-
-
-
 def create_app(chat_model: "ChatModel") -> "FastAPI":
     app = FastAPI(lifespan=lifespan)
 
@@ -128,8 +125,8 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
             tools = ""
 
         if request.stream:
-            # if tools:
-            #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot stream function calls.")
+            if tools:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot stream function calls.")
 
             generate = stream_chat_completion(input_messages, system, tools, request)
 
@@ -237,7 +234,6 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
                 input_messages.append(ChatMessage(role=Role.TOOL, content=tool_response))
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
-
 
     @app.post("/v1/chat/tool/call", response_model=ChatCompletionResponse, status_code=status.HTTP_200_OK)
     async def create_tool_call(request: ToolCallRequest):
