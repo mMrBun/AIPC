@@ -1,19 +1,18 @@
-transformers==4.38.2
-infinity-emb[torch]==0.0.17
-vllm>=0.3.3
-trl
-peft>=0.9.0
-datasets
-openai
-ipython
-sentencepiece
-sentence_transformers
-pyecharts
 fastapi==0.110.0
-tiktoken
-einops
-transformers_stream_generator
-accelerate
-langchain
-sse-starlette
-langchain-openai
+uvicorn==0.29.0
+langchain==0.1.13
+sentence-transformers==2.2.2
+datasets==2.18.0
+accelerate>=0.27.2
+trl>=0.8.1
+peft==0.10.0
+sentencepiece==0.2.0
+sse-starlette==2.0.0
+
+# The VLLM is currently not supported on Windows. To prevent dependency installation errors, it has been temporarily commented out.
+# vllm==0.3.3
+
+# If you use qwen models please install dependencies below
+# tiktoken==0.6.0
+# einops==0.7.0
+# transformers-stream-generator==0.0.5
