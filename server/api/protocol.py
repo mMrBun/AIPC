@@ -73,7 +73,6 @@ class ToolCallRequest(BaseModel):
     model: Optional[str] = "gpt-3.5-turbo"
     messages: List[ChatMessage]
     top_k: Optional[int] = 5
-    enable_retriever: Optional[bool] = False
     do_sample: Optional[bool] = True
     temperature: Optional[float] = 0.9
     top_p: Optional[float] = 0.1

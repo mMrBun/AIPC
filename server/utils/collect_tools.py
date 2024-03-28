@@ -3,7 +3,7 @@ import importlib.util
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain.tools import BaseTool
 
-from configs.base_config import TOOLS_DIR, RETRIEVAL_MODEL_PATH
+from configs.base_config import TOOLS_DIR, RETRIEVAL_MODEL_PATH, RETRIEVAL_MODEL_ENABLED
 from server.api.protocol import ToolCallRequest
 from server.retriever.build_retriever import ToolRetrieverLoader, ToolRetrieverEmbedder
 
@@ -36,7 +36,7 @@ def get_tools() -> tuple[dict, list]:
     toos_list: A list of tool's description, where each tool is formatted as an OpenAI tool.
     """
     tools_dict = {}
-    tools_list = []
+    tool_list = []
     tool_classes = collect_tool_classes(TOOLS_DIR)
     tools = [tool_class() for tool_class in tool_classes]
 
@@ -44,13 +44,13 @@ def get_tools() -> tuple[dict, list]:
         if tool.enabled:
             tools_dict[tool.name] = tool
             tool_description = convert_to_openai_tool(tool)
-            tools_list.append(tool_description)
+            tool_list.append(tool_description)
 
-    return tools_dict, tools_list
+    return tools_dict, tool_list
 
 
 def retrieval_tools(request: ToolCallRequest):
-    if request.enable_retriever:
+    if RETRIEVAL_MODEL_ENABLED:
         query = request.messages[-1].content
         tools = embedding.do_retrieve(query, request.top_k)
         return tools_list[0], tools
@@ -59,5 +59,6 @@ def retrieval_tools(request: ToolCallRequest):
 
 
 tools_list = get_tools()
-loader = ToolRetrieverLoader(model_path=RETRIEVAL_MODEL_PATH)
-embedding = ToolRetrieverEmbedder(model_loader_instance=loader, defined_tools=tools_list)
+if RETRIEVAL_MODEL_ENABLED:
+    loader = ToolRetrieverLoader(model_path=RETRIEVAL_MODEL_PATH)
+    embedding = ToolRetrieverEmbedder(model_loader_instance=loader, defined_tools=tools_list)
