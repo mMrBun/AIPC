@@ -7,7 +7,7 @@ as this can help the model work better.
 import abc
 import json
 import subprocess
-from typing import Any
+from typing import Any, Type
 
 from server.extras.packages import is_pycaw_available
 
@@ -39,10 +39,18 @@ class SetVolume(BaseTool, abc.ABC):
     """
     name = "set_volume"
     description = "set the volume level of the audio"
+    args_schema: Type[BaseModel] = SetVolumeInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,

@@ -7,18 +7,18 @@ as this can help the model work better.
 import abc
 import json
 import os
-from typing import Any
+from typing import Any, Type
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
 from configs.base_config import CURRENT_PLATFORM
 
 
-class SetBrightnessInput(BaseModel):
-    theme_type: int = Field(description="type of theme: dark or light", examples=['dark', 'light'])
+class SetThemeInput(BaseModel):
+    theme_type: str = Field(description="type of theme: dark or light", examples=['dark', 'light'])
 
 
-class SetBrightness(BaseTool, abc.ABC):
+class SetTheme(BaseTool, abc.ABC):
     """
     🤗name: The name of the tool may require specific prefix words like "get_" in the inference client of some models.
     Please adjust the naming format here accordingly based on the differences between models.
@@ -30,24 +30,25 @@ class SetBrightness(BaseTool, abc.ABC):
     🤗enabled: If the tool is enabled or not. If the tool is not enabled, it will not be available for use.
     """
     name = "set_theme"
-    description = "set global theme of the PC"
+    description = "set dark or light theme."
+    args_schema: Type[BaseModel] = SetThemeInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,
             *args: Any,
             **kwargs: Any,
     ) -> Any:
-
-        DARK_SYSTEM = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v SystemUsesLightTheme /t REG_DWORD /d 0 /f"
-        DARK_APPS = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v AppsUseLightTheme /t REG_DWORD /d 0 /f"
-        LIGHT_SYSTEM = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v SystemUsesLightTheme /t REG_DWORD /d 1 /f"
-        LIGHT_APPS = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v AppsUseLightTheme /t REG_DWORD /d 1 /f"
-
-        ver = int(os.popen("ver").read()[28:33]) >= 18362
 
         def dark():
             os.system(DARK_SYSTEM)
@@ -67,6 +68,12 @@ class SetBrightness(BaseTool, abc.ABC):
             if theme_type not in ['dark', 'light']:
                 return json.dumps({"code": 500, "msg": "Unsupported theme type", "data": {}})
             if current_os == "Windows":
+                DARK_SYSTEM = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v SystemUsesLightTheme /t REG_DWORD /d 0 /f"
+                DARK_APPS = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v AppsUseLightTheme /t REG_DWORD /d 0 /f"
+                LIGHT_SYSTEM = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v SystemUsesLightTheme /t REG_DWORD /d 1 /f"
+                LIGHT_APPS = "reg.exe add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize /v AppsUseLightTheme /t REG_DWORD /d 1 /f"
+
+                ver = int(os.popen("ver").read()[28:33]) >= 18362
                 if theme_type == 'dark':
                     dark()
                 elif theme_type == 'light':

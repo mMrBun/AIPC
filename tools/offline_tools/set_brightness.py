@@ -10,7 +10,7 @@ from server.extras.packages import is_screen_brightness_control_available
 
 if is_screen_brightness_control_available():
     import screen_brightness_control as sbc
-from typing import Any
+from typing import Any, Type
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -34,10 +34,18 @@ class SetBrightness(BaseTool, abc.ABC):
     """
     name = "set_brightness"
     description = "set the brightness level of the screen"
+    args_schema: Type[BaseModel] = SetBrightnessInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,

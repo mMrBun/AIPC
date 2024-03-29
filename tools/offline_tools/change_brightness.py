@@ -6,7 +6,7 @@ as this can help the model work better.
 """
 import abc
 import json
-from typing import Any
+from typing import Any, Type
 
 from server.extras.packages import is_screen_brightness_control_available
 
@@ -20,7 +20,7 @@ from configs.base_config import CURRENT_PLATFORM
 
 
 class ChangeBrightnessInput(BaseModel):
-    type: float = Field(description="turn up or turn down brightness", examples=["up", "down"], default="up")
+    type: str = Field(description="turn up or turn down brightness", examples=["up", "down"], default="up")
 
 
 class ChangeBrightness(BaseTool, abc.ABC):
@@ -36,10 +36,18 @@ class ChangeBrightness(BaseTool, abc.ABC):
     """
     name = "change_brightness"
     description = "turn up or turn down the brightness level of the screen"
+    args_schema: Type[BaseModel] = ChangeBrightnessInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,

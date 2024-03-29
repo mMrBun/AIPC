@@ -6,7 +6,7 @@ as this can help the model work better.
 """
 import abc
 import json
-from typing import Any
+from typing import Any, Type
 from server.extras.packages import is_pycaw_available
 
 if is_pycaw_available():
@@ -21,7 +21,7 @@ from configs.base_config import CURRENT_PLATFORM
 
 
 class ChangeVolumeInput(BaseModel):
-    type: float = Field(description="turn up or turn down volume", examples=["up", "down"], default="up")
+    type: str = Field(description="turn up or turn down volume", examples=["up", "down"], default="up")
 
 
 class ChangeVolume(BaseTool, abc.ABC):
@@ -37,10 +37,18 @@ class ChangeVolume(BaseTool, abc.ABC):
     """
     name = "change_volume"
     description = "turn up or turn down the volume level of the audio"
+    args_schema: Type[BaseModel] = ChangeVolumeInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,

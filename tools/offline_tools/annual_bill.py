@@ -42,6 +42,13 @@ class AnnualBill(BaseTool, abc.ABC):
     def __init__(self):
         super().__init__()
 
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
+
     async def _arun(
             self,
             *args: Any,

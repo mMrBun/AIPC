@@ -8,7 +8,7 @@ import abc
 import json
 import os
 import subprocess
-from typing import Any
+from typing import Any, Type
 from server.extras.packages import is_pycaw_available
 
 if is_pycaw_available():
@@ -23,7 +23,7 @@ from configs.base_config import CURRENT_PLATFORM
 
 
 class MuteVolumeInput(BaseModel):
-    mute_type: float = Field(description="mute or unmute", examples=["mute", "unmute"], default="mute")
+    mute_type: str = Field(description="mute or unmute", examples=["mute", "unmute"], default="mute")
 
 
 class MuteVolume(BaseTool, abc.ABC):
@@ -39,10 +39,18 @@ class MuteVolume(BaseTool, abc.ABC):
     """
     name = "mute_volume"
     description = "mute or unmute the volume level of the audio"
+    args_schema: Type[BaseModel] = MuteVolumeInput
     enabled = True
 
     def __init__(self):
         super().__init__()
+
+    def _run(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pass
 
     async def _arun(
             self,
