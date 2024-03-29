@@ -20,6 +20,7 @@ AIPC (Chat2BI) is an assistant that utilizes large language models to perform a 
 
 
 ## Roadmap
+
 - [x] Support for API services [#3](https://github.com/mMrBun/Chat2BI/issues/3)
 - [x] Support for PC control interface 
 - [x] Support for inference using vllm
@@ -27,7 +28,6 @@ AIPC (Chat2BI) is an assistant that utilizes large language models to perform a 
 - [ ] Support for connecting to a database to perform data queries as a data source for chart generation
 - [ ] Provide fine-tuning examples for tool invocation commands
 - [ ] Provide training examples for retrieval models
-
 
 ## Quick Start
 Modify `RETRIEVAL_MODEL_PATH` in configs/base_config.py to your retrieval model path.
