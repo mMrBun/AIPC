@@ -1,8 +1,8 @@
 import ctypes
+import os
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-import os
 
 
 # 修改系统壁纸
@@ -12,12 +12,17 @@ def set_wallpaper(image_path):
 
 
 # 修改系统音量 ，浮点0-1代表0-100%
+
+
 def set_volume(volume):
     devices = AudioUtilities.GetSpeakers()
     interface = devices.Activate(
-        IAudioEndpointVolume.iid_, CLSCTX_ALL, None)
+        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
     volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
     volume_interface.SetMasterVolumeLevelScalar(volume, None)
+
+
+set_volume(0.5)  # 设置音量为 50%
 
 
 # 修改系统亮度 ，浮点0-1代表0-100%
@@ -48,10 +53,10 @@ def set_theme(theme_file_path):
 
 
 if __name__ == '__main__':
-    set_wallpaper("path_to_your_image.jpg")
-    set_volume(0.06)
-    set_brightness(1)
-    set_theme('path_to_your_theme_file.theme')
+    set_wallpaper("C:/Users/17835/Pictures/Saved Pictures/4.png")
+    set_volume(0.5)
+    # set_brightness(1)
+    # set_theme('path_to_your_theme_file.theme')
 
 # pip install comtypes
 # pip install pycaw
