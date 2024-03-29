@@ -45,13 +45,13 @@ AIPC（Chat2BI）是一个利用大型语言模型执行广泛工具调用的助
 
 ## 创建虚拟环境
 ```bash
-git clone https://github.com/mMrBun/Chat2BI.git
+git clone https://github.com/mMrBun/AIPC.git
 
-conda create -n Chat2BI python=3.10
+conda create -n AIPC python=3.10
 
-conda activate Chat2BI
+conda activate AIPC
 
-cd Chat2BI
+cd AIPC
 
 pip install -r requirements.txt
 ```
