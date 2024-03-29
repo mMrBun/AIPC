@@ -44,13 +44,12 @@ If you don't have a retrieval model, you can download the model from the followi
 
 ## Setting Up a Virtual Environment
 ```bash
-git clone https://github.com/mMrBun/Chat2BI.git
+git clone https://github.com/mMrBun/AIPC.git
+conda create -n AIPC python=3.10
 
-conda create -n Chat2BI python=3.10
+conda activate AIPC
 
-conda activate Chat2BI
-
-cd Chat2BI
+cd AIPC
 
 pip install -r requirements.txt
 ```
