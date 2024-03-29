@@ -1,5 +1,8 @@
 import os
 
+from server.utils.get_current_platform import get_os
+
+CURRENT_PLATFORM = get_os()
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT_PATH, 'tools')
 

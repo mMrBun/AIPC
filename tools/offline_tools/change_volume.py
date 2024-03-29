@@ -6,8 +6,6 @@ as this can help the model work better.
 """
 import abc
 import json
-import os
-import subprocess
 from typing import Any
 from server.extras.packages import is_pycaw_available
 
@@ -22,11 +20,11 @@ from pydantic import BaseModel, Field
 from configs.base_config import CURRENT_PLATFORM
 
 
-class MuteVolumeInput(BaseModel):
-    mute_type: float = Field(description="mute or unmute", examples=["mute", "unmute"], default="mute")
+class ChangeVolumeInput(BaseModel):
+    type: float = Field(description="turn up or turn down volume", examples=["up", "down"], default="up")
 
 
-class MuteVolume(BaseTool, abc.ABC):
+class ChangeVolume(BaseTool, abc.ABC):
     """
     🤗name: The name of the tool may require specific prefix words like "get_" in the inference client of some models.
     Please adjust the naming format here accordingly based on the differences between models.
@@ -37,8 +35,8 @@ class MuteVolume(BaseTool, abc.ABC):
      and default values for each parameter.
     🤗enabled: If the tool is enabled or not. If the tool is not enabled, it will not be available for use.
     """
-    name = "mute_volume"
-    description = "mute or unmute the volume level of the audio"
+    name = "change_volume"
+    description = "turn up or turn down the volume level of the audio"
     enabled = True
 
     def __init__(self):
@@ -49,50 +47,37 @@ class MuteVolume(BaseTool, abc.ABC):
             *args: Any,
             **kwargs: Any,
     ) -> Any:
-        def mute_windows():
+        volume_bias = 0.05
+
+        def change_windows(type: str):
+            if type not in ["up", "down"]:
+                raise ValueError("type must be 'up' or 'down'")
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
             volume = cast(interface, POINTER(IAudioEndpointVolume))
-            volume.SetMute(1, None)
-
-        def unmute_windows():
-            devices = AudioUtilities.GetSpeakers()
-            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-            volume = cast(interface, POINTER(IAudioEndpointVolume))
-            volume.SetMute(0, None)
-
-        def mute_macos():
-            subprocess.run(["osascript", "-e", "set volume output muted true"])
-
-        def unmute_macos():
-            subprocess.run(["osascript", "-e", "set volume output muted false"])
-
-        def mute_linux():
-            subprocess.run(["amixer", "set", "Master", "mute"])
-
-        def unmute_linux():
-            subprocess.run(["amixer", "set", "Master", "unmute"])
-
+            if type == "up":
+                current_volume = volume.GetMasterVolumeLevelScalar()
+                if current_volume + volume_bias > 1:
+                    volume.SetMasterVolumeLevelScalar(1, None)
+                else:
+                    volume.SetMasterVolumeLevelScalar(current_volume + volume_bias, None)
+            else:
+                current_volume = volume.GetMasterVolumeLevelScalar()
+                if current_volume - volume_bias < 0:
+                    volume.SetMasterVolumeLevelScalar(0, None)
+                else:
+                    volume.SetMasterVolumeLevelScalar(current_volume - volume_bias, None)
         try:
             current_os = CURRENT_PLATFORM
-            mute_type = kwargs.get("mute_type")
+            type = kwargs.get("type")
             if current_os == "Windows":
-                if mute_type == "mute":
-                    mute_windows()
-                elif mute_type == "unmute":
-                    unmute_windows()
+                change_windows(type)
             elif current_os == "macOS":
-                if mute_type == "mute":
-                    mute_macos()
-                elif mute_type == "unmute":
-                    unmute_macos()
+                return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
             elif current_os == "Linux":
-                if mute_type == "mute":
-                    mute_linux()
-                elif mute_type == "unmute":
-                    unmute_linux()
+                return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
             else:
                 return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
-            return json.dumps({"code": 200, "msg": "success", "data": {"mute_type": mute_type, "os": current_os}})
+            return json.dumps({"code": 200, "msg": "success", "data": {"mute_type": type, "os": current_os}})
         except Exception as e:
             return json.dumps({"code": 500, "msg": str(e)[-40:], "data": {}})

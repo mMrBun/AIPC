@@ -18,4 +18,13 @@ sse-starlette==2.0.0
 # transformers-stream-generator==0.0.5
 
 # If you want to test the examples in the README, uncomment the following line
+# Windows
 # pycaw==20240210
+# screen-brightness-control==0.22.2
+# pyecharts==2.0.5
+
+# macOS
+# ......
+
+# Linux
+# ......

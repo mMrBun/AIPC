@@ -6,15 +6,12 @@ as this can help the model work better.
 """
 import abc
 import json
-import subprocess
 from typing import Any
 
-from server.extras.packages import is_pycaw_available
+from server.extras.packages import is_screen_brightness_control_available
 
-if is_pycaw_available():
-    from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-    from ctypes import cast, POINTER
-    from comtypes import CLSCTX_ALL
+if is_screen_brightness_control_available():
+    import screen_brightness_control as sbc
 
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
@@ -22,11 +19,11 @@ from pydantic import BaseModel, Field
 from configs.base_config import CURRENT_PLATFORM
 
 
-class SetVolumeInput(BaseModel):
-    volume_level: float = Field(description="volume level, range: 0.0 - 1.0", examples=[0.1, 0.5, 1], default="0.02")
+class ChangeBrightnessInput(BaseModel):
+    type: float = Field(description="turn up or turn down brightness", examples=["up", "down"], default="up")
 
 
-class SetVolume(BaseTool, abc.ABC):
+class ChangeBrightness(BaseTool, abc.ABC):
     """
     🤗name: The name of the tool may require specific prefix words like "get_" in the inference client of some models.
     Please adjust the naming format here accordingly based on the differences between models.
@@ -37,8 +34,8 @@ class SetVolume(BaseTool, abc.ABC):
      and default values for each parameter.
     🤗enabled: If the tool is enabled or not. If the tool is not enabled, it will not be available for use.
     """
-    name = "set_volume"
-    description = "set the volume level of the audio"
+    name = "change_brightness"
+    description = "turn up or turn down the brightness level of the screen"
     enabled = True
 
     def __init__(self):
@@ -49,30 +46,34 @@ class SetVolume(BaseTool, abc.ABC):
             *args: Any,
             **kwargs: Any,
     ) -> Any:
+        brightness_bias = 10
 
-        def set_volume_windows(volume_level: float):
-            devices = AudioUtilities.GetSpeakers()
-            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-            volume = cast(interface, POINTER(IAudioEndpointVolume))
-            volume.SetMasterVolumeLevelScalar(volume_level, None)
-
-        def set_volume_macos(volume_level):
-            subprocess.run(["osascript", "-e", f"set volume output volume {volume_level}"])
-
-        def set_volume_linux(volume_level):
-            subprocess.run(["amixer", "set", "Master", f"{volume_level}%"])
+        def change_windows(type: str):
+            if type not in ["up", "down"]:
+                raise ValueError("type must be 'up' or 'down'")
+            current_brightness = sbc.get_brightness()[0]
+            if type == "up":
+                if current_brightness + brightness_bias > 100:
+                    sbc.set_brightness(100)
+                else:
+                    sbc.set_brightness(current_brightness + brightness_bias)
+            else:
+                if current_brightness - brightness_bias < 0:
+                    sbc.set_brightness(0)
+                else:
+                    sbc.set_brightness(current_brightness - brightness_bias)
 
         try:
             current_os = CURRENT_PLATFORM
-            volume_level = kwargs.get("volume_level")
+            type = kwargs.get("type")
             if current_os == "Windows":
-                set_volume_windows(volume_level)
+                change_windows(type)
             elif current_os == "macOS":
-                set_volume_macos(volume_level)
+                return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
             elif current_os == "Linux":
-                set_volume_linux(volume_level)
+                return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
             else:
                 return json.dumps({"code": 500, "msg": "Unsupported OS", "data": {}})
-            return json.dumps({"code": 200, "msg": "success", "data": {"volume_level": volume_level, "os": current_os}})
+            return json.dumps({"code": 200, "msg": "success", "data": {"mute_type": type, "os": current_os}})
         except Exception as e:
             return json.dumps({"code": 500, "msg": str(e)[-40:], "data": {}})

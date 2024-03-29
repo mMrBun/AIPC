@@ -63,3 +63,11 @@ def is_vllm_available():
 
 def is_pyecharts_available():
     return _is_package_available("pyecharts")
+
+
+def is_screen_brightness_control_available():
+    return _is_package_available("screen-brightness-control")
+
+
+def is_pycaw_available():
+    return _is_package_available("pycaw")
