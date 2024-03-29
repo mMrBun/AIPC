@@ -30,7 +30,7 @@ REACT_SYSTEM_PROMPT = (
     "Question: the input question you must answer\n"
     "Thought: you should always think about what to do\n"
     "Action: the action to take, should be one of [{tool_names}]\n"
-    "Action Input: the input to the action\n"
+    "Action Input: the input to the action{format_prompt}.\n"
     "Observation: the result of the action\n"
     "... (this Thought/Action/Action Input/Observation can be repeated zero or more times)\n"
     "Thought: I now know the final answer\n"

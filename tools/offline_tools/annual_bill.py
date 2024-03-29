@@ -10,9 +10,17 @@ from typing import Type, Any
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
+from server.extras.packages import is_pyecharts_available
+
+if is_pyecharts_available():
+    from pyecharts.charts import Bar
+    from pyecharts.charts import Pie
+    from pyecharts.charts import Line
+
 
 class AnnualBillInput(BaseModel):
     year: str = Field(description="Year number", examples=[2023, 2024])
+    chart_type: str = Field(description="图表类型，bar为柱状图，line为折线图，pie为饼图", examples=['bar', 'line', 'pie'])
 
 
 class AnnualBill(BaseTool, abc.ABC):
@@ -27,14 +35,14 @@ class AnnualBill(BaseTool, abc.ABC):
     🤗enabled: If the tool is enabled or not. If the tool is not enabled, it will not be available for use.
     """
     name = "get_annual_bill"
-    description = "Get the annual bill for a given year"
+    description = "Get the annual bill for a given year and return a chart"
     args_schema: Type[BaseModel] = AnnualBillInput
-    enabled = False
+    enabled = True
 
     def __init__(self):
         super().__init__()
 
-    def _run(self, year: int) -> str:
+    def _run(self, year: int, chart_type: str) -> str:
         """
         Write down the implementation logic for the tool here.
         """
@@ -92,7 +100,11 @@ class AnnualBill(BaseTool, abc.ABC):
                 },
             ]
         }
-        return json.dumps(bill)
+        x_axis = [item.get("month") for item in bill.get("bill")]
+        y_axis = [item.get("cost") for item in bill.get("bill")]
+        echarts_builder = EchartsBuilder(x_axis=x_axis, y_axis=y_axis)
+        chart_html_code = echarts_builder.build_chart(chart_type=chart_type)
+        return chart_html_code
 
     async def _arun(
             self,
@@ -155,4 +167,52 @@ class AnnualBill(BaseTool, abc.ABC):
                 },
             ]
         }
-        return json.dumps(bill)
+        x_axis = [item.get("month") for item in bill.get("bill")]
+        y_axis = [{"name": "cost", "data": [item.get("cost") for item in bill.get("bill")]}]
+        echarts_builder = EchartsBuilder(x_axis=x_axis, y_axis=y_axis)
+        chart_html_code = echarts_builder.build_chart(chart_type=kwargs.get("chart_type"))
+        return chart_html_code
+
+
+class EchartsBuilder:
+    def __init__(self, x_axis, y_axis):
+        self.x_axis = x_axis
+        self.y_axis = y_axis
+
+    def build_chart(self, chart_type):
+        if chart_type.lower() == "bar":
+            return self.build_bar_chart()
+        if chart_type.lower() == "line":
+            return self.build_line_chart()
+        if chart_type.lower() == "pie":
+            return self.build_pie_chart()
+
+    def build_bar_chart(self):
+        bar = Bar()
+        bar.add_xaxis(self.x_axis)
+        for data in self.y_axis:
+            bar.add_yaxis(data.get("name"), data.get("data"))
+        return bar.render_embed()
+
+    def build_line_chart(self):
+        line = Line()
+        line.add_xaxis(self.x_axis)
+        for data in self.y_axis:
+            line.add_yaxis(data.get("name"), data.get("data"))
+        return line.render_embed()
+
+    def build_pie_chart(self):
+        pie = Pie()
+        pie.add("", json_to_tuple_set(self.y_axis))
+        return pie.render_embed()
+
+
+def json_to_tuple_set(json_str: str):
+    data = json.loads(json_str)
+
+    if not isinstance(data, list):
+        raise ValueError("JSON must represent a list of elements")
+
+    tuple_list = [tuple(item) for item in data]
+
+    return tuple_list

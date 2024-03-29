@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 from ..extras.logging import get_logger
-from .formatter import EmptyFormatter, FunctionFormatter, StringFormatter, ToolFormatter
+from .formatter import EmptyFormatter, FunctionFormatter, StringFormatter, ToolFormatter, MessageFormatter
 from .utils import Role, infer_max_len
 
 
@@ -23,6 +23,7 @@ class Template:
     format_function: "Formatter"
     format_observation: "Formatter"
     format_tools: "Formatter"
+    format_message: "Formatter"
     format_separator: "Formatter"
     default_system: str
     stop_words: List[str]
@@ -206,6 +207,7 @@ def _register_template(
     format_function: Optional["Formatter"] = None,
     format_observation: Optional["Formatter"] = None,
     format_tools: Optional["Formatter"] = None,
+    format_message: Optional["Formatter"] = None,
     format_separator: Optional["Formatter"] = None,
     default_system: str = "",
     stop_words: List[str] = [],
@@ -245,6 +247,7 @@ def _register_template(
     default_assistant_formatter = StringFormatter(slots=["{{content}}"] + eos_slots)
     default_function_formatter = FunctionFormatter(slots=["Action: {{name}}\nAction Input: {{arguments}}"] + eos_slots)
     default_tool_formatter = ToolFormatter(tool_format="default")
+    default_message_formatter = MessageFormatter(tool_format="default")
     default_separator_formatter = EmptyFormatter()
     templates[name] = template_class(
         format_user=format_user or default_user_formatter,
@@ -253,6 +256,7 @@ def _register_template(
         format_function=format_function or default_function_formatter,
         format_observation=format_observation or format_user or default_user_formatter,
         format_tools=format_tools or default_tool_formatter,
+        format_message=format_message or default_message_formatter,
         format_separator=format_separator or default_separator_formatter,
         default_system=default_system,
         stop_words=stop_words,
@@ -665,6 +669,7 @@ _register_template(
     format_separator=EmptyFormatter(slots=["\n"]),
     default_system="You are a helpful assistant.",
     format_tools=ToolFormatter(tool_format="react"),
+    format_message=MessageFormatter(tool_format="react"),
     stop_words=["<|im_end|>", "Observ"],
     replace_eos=True,
 )

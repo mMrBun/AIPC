@@ -108,7 +108,7 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
 
         input_messages = []
         for i, message in enumerate(request.messages):
-            if i % 2 == 0 and message.role not in [Role.USER, Role.TOOL]:
+            if i % 2 == 0 and message.role not in [Role.USER, Role.TOOL, Role.OBSERVATION]:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role")
             elif i % 2 == 1 and message.role not in [Role.ASSISTANT, Role.FUNCTION]:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role")
@@ -231,7 +231,8 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
 
             try:
                 tool_response = await tool.arun(dict(json.loads(tool_call.function.arguments)))
-                input_messages.append(ChatMessage(role=Role.TOOL, content=tool_response))
+                tool_response = chat_model.engine.template.format_message.apply(content=tool_response)
+                input_messages.append(ChatMessage(role=Role.TOOL, content=f"\nObservation: {tool_response}"))
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
@@ -266,7 +267,7 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
             except RETRY_EXCEPTIONS as e:
                 retries_left -= 1
                 logging.error(e)
-                input_messages.append(ChatMessage(role=Role.OBSERVATION, content=str(e)[-40:]))
+                input_messages.append(ChatMessage(role=Role.TOOL, content=str(e)[-40:]))
                 if retries_left == 0:
                     choices = [ChatCompletionResponseChoice(
                         index=0,

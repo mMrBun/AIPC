@@ -47,7 +47,7 @@ def default_tool_formatter(tools: List[Dict[str, Any]]):
 def react_tool_formatter(tools: List[Dict[str, Any]]):
     tool_text, tool_names = parse_default_tool(tools)
     return REACT_SYSTEM_PROMPT.format(
-        tool_text=tool_text, tool_names=", ".join(tool_names)
+        tool_text=tool_text, tool_names=", ".join(tool_names), format_prompt=JSON_FORMAT_PROMPT
     )
 
 
@@ -80,6 +80,7 @@ def chatglm3_tool_extractor(content: str) -> Union[str, Tuple[str, str]]:
     for response in content.split("<|assistant|>"):
         tool_name, arguments = response.split("\n", maxsplit=1)
         if not tool_name.strip():
+            # TODO code interpreter implement
             return content
         else:
             arguments = "\n".join(arguments.split("\n")[1:-1])
@@ -214,3 +215,22 @@ class ToolFormatter(Formatter):
             return chatglm3_tool_extractor(content)
         else:
             raise NotImplementedError
+
+
+@dataclass
+class MessageFormatter(Formatter):
+    def __post_init__(self):
+        if self.tool_format is None:
+            raise ValueError("Tool format was not found.")
+
+    def apply(self, **kwargs) -> SLOTS:
+        content = kwargs.pop("content")
+        try:
+            if self.tool_format == "default" or self.tool_format == "chatglm3":
+                return content
+            elif self.tool_format == "react":
+                return f"\nObservation: {content}"
+            else:
+                raise NotImplementedError
+        except Exception:
+            return [""]
