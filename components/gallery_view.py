@@ -13,7 +13,7 @@ class GalleryView(ft.Row):
         self.expand = True
         self.controls = [
             self.left_nav,
-            ft.VerticalDivider(width=1),
+            # ft.VerticalDivider(width=1),
             self.examples_view,
         ]
 

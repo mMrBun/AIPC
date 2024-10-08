@@ -1,7 +1,6 @@
 import logging
 
 import flet as ft
-import flet.version
 
 from components.gallery_view import GalleryView
 from gallerydata import GalleryData
@@ -13,7 +12,6 @@ logging.basicConfig(level=logging.INFO)
 
 def main(page: ft.Page):
     page.title = "AIPC"
-
 
     page.fonts = {
         "Roboto Mono": "RobotoMono-VariableFont_wght.ttf",

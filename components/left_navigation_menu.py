@@ -36,7 +36,7 @@ class NavigationItem(ft.Container):
 class NavigationColumn(ft.Column):
     def __init__(self, gallery):
         super().__init__()
-        self.expand = 4
+        self.expand = 6
         self.spacing = 0
         self.scroll = ft.ScrollMode.ALWAYS
         self.width = 200
