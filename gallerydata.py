@@ -1,9 +1,9 @@
-import importlib.util
 import os
 import sys
+import flet as ft
+import importlib.util
 from pathlib import Path
 
-import flet as ft
 
 
 class GridItem:
@@ -76,7 +76,7 @@ class GalleryData:
         file_path = os.path.join(
             str(Path(__file__).parent), "views", control_group_dir
         )
-        example_files = [f for f in os.listdir(file_path) if not f.startswith("_")]
+        example_files = [f for f in os.listdir(file_path) if f in ['index.py']]
         return example_files
 
     def import_modules(self):
@@ -102,21 +102,21 @@ class GalleryData:
                     sys.modules[module_name] = module
                     spec.loader.exec_module(module)
                     print(f"{module_name!r} has been imported")
-                    if file == "index.py":
-                        grid_item.name = module.name
-                        grid_item.description = module.description
-                    else:
-                        example_item = ExampleItem()
-                        example_item.example = module.example
+                    # if file == "index.py":
+                    #     grid_item.name = module.name
+                    #     grid_item.description = module.description
+                    # else:
+                    example_item = ExampleItem()
+                    example_item.example = module.build_page
 
-                        example_item.file_name = (
-                            module_name.replace(".", "/") + ".py"
-                        )
-                        example_item.name = module.name
-                        example_item.order = file[
-                            :2
-                        ]  # first 2 characters of example file name (e.g. '01')
-                        grid_item.examples.append(example_item)
+                    example_item.file_name = (
+                        module_name.replace(".", "/") + ".py"
+                    )
+                    example_item.name = module.name
+                    example_item.order = file[
+                        :2
+                    ]  # first 2 characters of example file name (e.g. '01')
+                    grid_item.examples.append(example_item)
             grid_item.examples.sort(key=lambda x: x.order)
             control_group_dir.grid_items.append(grid_item)
             try:

@@ -4,4 +4,4 @@ name = "Chat Page"
 description = "Chat Page"
 
 def build_page():
-    return ft.Placeholder(content=ft.Text("Chat"))
+    return ft.Text("aaaaaaaaaaaaaaa")

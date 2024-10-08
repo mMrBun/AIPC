@@ -12,7 +12,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main(page: ft.Page):
-    page.title = "Flet controls gallery"
+    page.title = "AIPC"
+
 
     page.fonts = {
         "Roboto Mono": "RobotoMono-VariableFont_wght.ttf",
@@ -32,19 +33,6 @@ def main(page: ft.Page):
             gallery_view.display_control_examples(route_list[0])
 
     gallery_view = GalleryView(gallery)
-
-    page.appbar = ft.AppBar(
-        leading=ft.Container(padding=5, content=ft.Image(src=f"logo.png")),
-        leading_width=40,
-        title=ft.Text("Flet Controls Gallery"),
-        center_title=True,
-        bgcolor=ft.colors.INVERSE_PRIMARY,
-        actions=[
-            ft.Container(
-                padding=10, content=ft.Text(f"Flet version: {flet.version.version}")
-            )
-        ],
-    )
 
     page.theme_mode = ft.ThemeMode.LIGHT
     page.on_error = lambda e: print("Page error:", e.data)
