@@ -31,12 +31,13 @@ class NavigationItem(ft.Container):
         self.text = destination.label
         self.content = ft.Row([ft.Icon(self.icon), ft.Text(self.text)])
         self.on_click = item_clicked
+        self.visible = destination.visible
 
 
 class NavigationColumn(ft.Column):
     def __init__(self, gallery):
         super().__init__()
-        self.expand = 4
+        self.expand = 5
         self.spacing = 0
         self.scroll = ft.ScrollMode.ALWAYS
         self.width = 200
@@ -74,20 +75,24 @@ class NavigationColumn(ft.Column):
 class LeftNavigationMenu(ft.Column):
     def __init__(self, gallery):
         super().__init__()
+        # self.offset = ft.transform.Offset(2, 2),
         self.gallery = gallery
-
         self.rail = NavigationColumn(gallery=gallery)
-
+        self.is_expanded = True
         self.dark_light_text = ft.Text("Light theme")
+        self.settings_text = ft.Text("Settings")
         self.dark_light_icon = ft.IconButton(
             icon=ft.icons.BRIGHTNESS_2_OUTLINED,
             tooltip="Toggle brightness",
             on_click=self.theme_changed,
         )
+        self.toggle_button = ft.IconButton(
+            icon=ft.icons.ARROW_LEFT,
+            tooltip="Toggle menu",
+            on_click=self.toggle_menu,
+        )
 
-        self.controls = [
-            self.rail,
-            ft.Column(
+        self.sub_rail = ft.Column(
                 expand=1,
                 controls=[
                     ft.Row(
@@ -101,17 +106,62 @@ class LeftNavigationMenu(ft.Column):
                             ft.PopupMenuButton(
                                 icon=ft.icons.SETTINGS,
                                 items=[
-                                    ft.PopupMenuItem(text="KnowledgeBase Settings"),
+                                    ft.PopupMenuItem(
+                                        icon=ft.icons.BOOK,
+                                        text="KnowledgeBase Settings",
+                                        on_click=self.menu_clicked
+                                    ),
                                     ft.PopupMenuItem(),
-                                    ft.PopupMenuItem(text="Model Settings"),
+                                    ft.PopupMenuItem(
+                                        icon=ft.icons.MODEL_TRAINING,
+                                        text="Model Settings",
+                                        on_click=self.menu_clicked
+                                    ),
                                 ]
                             ),
-                            ft.Text("Settings"),
+                            self.settings_text
                         ]
                     ),
                 ],
-            ),
+                width=200
+            )
+
+        self.controls = [
+            self.rail,
+            self.sub_rail,
+            self.toggle_button,
         ]
+
+    def toggle_menu(self, e):
+        self.is_expanded = not self.is_expanded
+        self.update_menu()
+        self.page.update()
+
+    def update_menu(self):
+        if self.is_expanded:
+            self.rail.width = 200
+            self.sub_rail.width = 200
+            self.dark_light_text.visible = True
+            self.settings_text.visible = True
+            for item in self.rail.controls:
+                item.content.controls[1].visible = True
+        else:
+            self.rail.width = 50
+            self.sub_rail.width = 50
+            self.dark_light_text.visible = False
+            self.settings_text.visible = False
+            for item in self.rail.controls:
+                item.content.controls[1].visible = False
+
+        self.animate_size = ft.Animation(duration=300, curve=ft.AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED)
+
+
+    def menu_clicked(self, e):
+        if e.control.text == "KnowledgeBase Settings":
+            e.page.go("/knowledgebase_settings")
+        elif e.control.text == "Model Settings":
+            e.page.go("/model_settings")
+
 
     def theme_changed(self, e):
         if self.page.theme_mode == ft.ThemeMode.LIGHT:

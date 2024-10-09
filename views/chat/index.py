@@ -4,4 +4,5 @@ name = "Chat Page"
 description = "Chat Page"
 
 def build_page():
+
     return ft.Text("aaaaaaaaaaaaaaa")

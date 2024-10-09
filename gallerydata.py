@@ -23,13 +23,14 @@ class ExampleItem:
 
 
 class ControlGroup:
-    def __init__(self, name, label, icon, selected_icon, index):
+    def __init__(self, name, label, icon, selected_icon, index, visible=True):
         self.name = name
         self.label = label
         self.icon = icon
         self.selected_icon = selected_icon
         self.grid_items = []
         self.index = index
+        self.visible = visible
 
 
 class GalleryData:
@@ -56,6 +57,22 @@ class GalleryData:
                 icon=ft.icons.INFO_OUTLINED,
                 selected_icon=ft.icons.INFO_SHARP,
                 index=2,
+            ),
+            ControlGroup(
+                name="knowledgebase_settings",
+                label="KnowledgeBaseSettings",
+                icon=ft.icons.INFO_OUTLINED,
+                selected_icon=ft.icons.INFO_SHARP,
+                index=3,
+                visible=False
+            ),
+            ControlGroup(
+                name="model_settings",
+                label="ModelSettings",
+                icon=ft.icons.INFO_OUTLINED,
+                selected_icon=ft.icons.INFO_SHARP,
+                index=4,
+                visible=False
             )
         ]
         self.import_modules()
@@ -102,10 +119,6 @@ class GalleryData:
                     sys.modules[module_name] = module
                     spec.loader.exec_module(module)
                     print(f"{module_name!r} has been imported")
-                    # if file == "index.py":
-                    #     grid_item.name = module.name
-                    #     grid_item.description = module.description
-                    # else:
                     example_item = ExampleItem()
                     example_item.example = module.build_page
 
