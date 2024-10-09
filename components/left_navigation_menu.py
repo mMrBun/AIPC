@@ -37,7 +37,7 @@ class NavigationItem(ft.Container):
 class NavigationColumn(ft.Column):
     def __init__(self, gallery):
         super().__init__()
-        self.expand = 5
+        self.expand = 6
         self.spacing = 0
         self.scroll = ft.ScrollMode.ALWAYS
         self.width = 200
@@ -75,7 +75,6 @@ class NavigationColumn(ft.Column):
 class LeftNavigationMenu(ft.Column):
     def __init__(self, gallery):
         super().__init__()
-        # self.offset = ft.transform.Offset(2, 2),
         self.gallery = gallery
         self.rail = NavigationColumn(gallery=gallery)
         self.is_expanded = True

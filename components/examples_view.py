@@ -7,12 +7,8 @@ class ExamplesView(ft.Column):
         self.gallery = gallery
         self.visible = False
         self.expand = True
-        # self.control_name_text = ft.Text(theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM)
-        # self.control_description = ft.Text(theme_style=ft.TextThemeStyle.BODY_MEDIUM)
-        self.examples = ft.Column(expand=True, spacing=10, scroll=ft.ScrollMode.AUTO)
+        self.examples = ft.Column(expand=True, spacing=0)
         self.controls = [
-            # self.control_name_text,
-            # self.control_description,
             self.examples,
         ]
 
@@ -24,37 +20,9 @@ class ExamplesView(ft.Column):
 
         for example in grid_item.examples:
             self.examples.controls.append(
-                ft.Column(
-                    controls=[
-                        # ft.Container(
-                        #     content=ft.Row(
-                        #         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                        #         controls=[
-                        #             # ft.Text(
-                        #             #     example.name,
-                        #             #     theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
-                        #             #     weight=ft.FontWeight.W_500,
-                        #             # ),
-                        #             # ft.IconButton(
-                        #             #     content=ft.Image(
-                        #             #         src="github-mark.svg",
-                        #             #         width=24,
-                        #             #         height=24,
-                        #             #         color=ft.colors.ON_SURFACE,
-                        #             #     ),
-                        #             #     url=f"https://github.com/flet-dev/examples/blob/main/python/apps/controls-gallery/examples/{example.file_name}",
-                        #             #     url_target=ft.UrlTarget.BLANK,
-                        #             # ),
-                        #         ],
-                        #     ),
-                        #     bgcolor=ft.colors.SECONDARY_CONTAINER,
-                        #     padding=5,
-                        #     border_radius=5,
-                        # ),
-                        ft.Container(
-                            content=example.example(),
-                            clip_behavior=ft.ClipBehavior.NONE,
-                        ),
-                    ],
-                )
+                ft.Container(
+                    content=example.example(),
+                    # clip_behavior=ft.ClipBehavior.NONE,
+                    expand=True,
+                ),
             )
