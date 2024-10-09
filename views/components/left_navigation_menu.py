@@ -1,4 +1,5 @@
 import flet as ft
+from pydantic.experimental.pipeline import transform
 
 
 class PopupColorItem(ft.PopupMenuItem):
@@ -80,6 +81,7 @@ class LeftNavigationMenu(ft.Column):
         self.is_expanded = True
         self.dark_light_text = ft.Text("Light theme")
         self.settings_text = ft.Text("Settings")
+        self.animate_size = ft.animation.Animation(duration=200)
         self.dark_light_icon = ft.IconButton(
             icon=ft.icons.BRIGHTNESS_2_OUTLINED,
             tooltip="Toggle brightness",
@@ -92,38 +94,38 @@ class LeftNavigationMenu(ft.Column):
         )
 
         self.sub_rail = ft.Column(
-                expand=1,
-                controls=[
-                    ft.Row(
-                        controls=[
-                            self.dark_light_icon,
-                            self.dark_light_text,
-                        ]
-                    ),
-                    ft.Row(
-                        controls=[
-                            ft.PopupMenuButton(
-                                icon=ft.icons.SETTINGS,
-                                items=[
-                                    ft.PopupMenuItem(
-                                        icon=ft.icons.BOOK,
-                                        text="KnowledgeBase Settings",
-                                        on_click=self.menu_clicked
-                                    ),
-                                    ft.PopupMenuItem(),
-                                    ft.PopupMenuItem(
-                                        icon=ft.icons.MODEL_TRAINING,
-                                        text="Model Settings",
-                                        on_click=self.menu_clicked
-                                    ),
-                                ]
-                            ),
-                            self.settings_text
-                        ]
-                    ),
-                ],
-                width=200
-            )
+            expand=1,
+            controls=[
+                ft.Row(
+                    controls=[
+                        self.dark_light_icon,
+                        self.dark_light_text,
+                    ]
+                ),
+                ft.Row(
+                    controls=[
+                        ft.PopupMenuButton(
+                            icon=ft.icons.SETTINGS,
+                            items=[
+                                ft.PopupMenuItem(
+                                    icon=ft.icons.BOOK,
+                                    text="KnowledgeBase Settings",
+                                    on_click=self.menu_clicked
+                                ),
+                                ft.PopupMenuItem(),
+                                ft.PopupMenuItem(
+                                    icon=ft.icons.MODEL_TRAINING,
+                                    text="Model Settings",
+                                    on_click=self.menu_clicked
+                                ),
+                            ]
+                        ),
+                        self.settings_text
+                    ]
+                ),
+            ],
+            width=200
+        )
 
         self.controls = [
             self.rail,
@@ -139,28 +141,32 @@ class LeftNavigationMenu(ft.Column):
     def update_menu(self):
         if self.is_expanded:
             self.rail.width = 200
+
             self.sub_rail.width = 200
+
             self.dark_light_text.visible = True
             self.settings_text.visible = True
+            self.toggle_button.icon = ft.icons.ARROW_LEFT
             for item in self.rail.controls:
                 item.content.controls[1].visible = True
+                item.content.controls[1].opacity = 1
         else:
             self.rail.width = 50
+
             self.sub_rail.width = 50
+
             self.dark_light_text.visible = False
             self.settings_text.visible = False
+            self.toggle_button.icon = ft.icons.ARROW_RIGHT
             for item in self.rail.controls:
                 item.content.controls[1].visible = False
-
-        self.animate_size = ft.Animation(duration=300, curve=ft.AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED)
-
+                item.content.controls[1].opacity = 0
 
     def menu_clicked(self, e):
         if e.control.text == "KnowledgeBase Settings":
             e.page.go("/knowledgebase_settings")
         elif e.control.text == "Model Settings":
             e.page.go("/model_settings")
-
 
     def theme_changed(self, e):
         if self.page.theme_mode == ft.ThemeMode.LIGHT:

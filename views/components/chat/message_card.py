@@ -1,10 +1,10 @@
 import flet as ft
 
-def main(page):
-    page.title = "卡片示例"
-    page.add(
-        ft.Card(
-            content=ft.Container(
+
+class MessageCard(ft.Card):
+    def __init__(self, **kwargs):
+        super(MessageCard, self).__init__(**kwargs)
+        self.content = ft.Container(
                 content=ft.Column(
                     [
                         ft.Row(
@@ -22,7 +22,3 @@ def main(page):
                 width=150,
                 height=60
             )
-        )
-    )
-
-ft.app(target=main)

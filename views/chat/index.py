@@ -1,28 +1,26 @@
 import flet as ft
-
+from views.components.chat.message_card import MessageCard
 name = "Chat Page"
 description = "Chat Page"
 
 
 def build_page():
+    chat_history = ft.ListView(expand=1, spacing=10, padding=20)
+    for i in range(10):
+        chat_history.controls.append(
+            MessageCard()
+        )
     main_structure = ft.Container(
-        bgcolor=ft.colors.BLUE,
         content=ft.Row(
             spacing=0,
             controls=[
                 ft.Container(
                     ft.Column(
                         controls=[
-                            ft.Text("Chat"),
+                            chat_history
                         ],
                     ),
-                    border=ft.Border(
-                        top=ft.BorderSide(color=ft.colors.RED, width=2),
-                        right=ft.BorderSide(color=ft.colors.RED, width=2),
-                        bottom=ft.BorderSide(color=ft.colors.RED, width=2),
-                        left=ft.BorderSide(color=ft.colors.RED, width=2),
-                    ),
-                    width=200,
+                    width=180,
                 ),
                 ft.Container(
                     ft.Column(
@@ -30,12 +28,6 @@ def build_page():
                             ft.Text("Chat"),
                         ],
 
-                    ),
-                    border=ft.Border(
-                        top=ft.BorderSide(color=ft.colors.BLACK, width=2),
-                        right=ft.BorderSide(color=ft.colors.BLACK, width=2),
-                        bottom=ft.BorderSide(color=ft.colors.BLACK, width=2),
-                        left=ft.BorderSide(color=ft.colors.BLACK, width=2),
                     ),
                     expand=1,
                 ),
@@ -45,13 +37,7 @@ def build_page():
                             ft.Text("Chat"),
                         ],
                     ),
-                    border=ft.Border(
-                        top=ft.BorderSide(color=ft.colors.PINK, width=2),
-                        right=ft.BorderSide(color=ft.colors.PINK, width=2),
-                        bottom=ft.BorderSide(color=ft.colors.PINK, width=2),
-                        left=ft.BorderSide(color=ft.colors.PINK, width=2),
-                    ),
-                    width=200,
+                    width=100,
                 ),
             ]
         ),

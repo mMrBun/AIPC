@@ -2,7 +2,7 @@ import logging
 
 import flet as ft
 
-from components.gallery_view import GalleryView
+from views.components.gallery_view import GalleryView
 from gallerydata import GalleryData
 
 gallery = GalleryData()
