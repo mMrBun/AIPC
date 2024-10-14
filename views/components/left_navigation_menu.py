@@ -1,6 +1,4 @@
 import flet as ft
-from pydantic.experimental.pipeline import transform
-
 
 class PopupColorItem(ft.PopupMenuItem):
     def __init__(self, color, name):
@@ -141,9 +139,7 @@ class LeftNavigationMenu(ft.Column):
     def update_menu(self):
         if self.is_expanded:
             self.rail.width = 200
-
             self.sub_rail.width = 200
-
             self.dark_light_text.visible = True
             self.settings_text.visible = True
             self.toggle_button.icon = ft.icons.ARROW_LEFT
@@ -152,9 +148,7 @@ class LeftNavigationMenu(ft.Column):
                 item.content.controls[1].opacity = 1
         else:
             self.rail.width = 50
-
             self.sub_rail.width = 50
-
             self.dark_light_text.visible = False
             self.settings_text.visible = False
             self.toggle_button.icon = ft.icons.ARROW_RIGHT
@@ -173,8 +167,15 @@ class LeftNavigationMenu(ft.Column):
             self.page.theme_mode = ft.ThemeMode.DARK
             self.dark_light_text.value = "Dark theme"
             self.dark_light_icon.icon = ft.icons.BRIGHTNESS_HIGH
+            self.page.theme = self.page.dark_theme = ft.theme.Theme(
+                color_scheme_seed="yellow",
+
+            )
         else:
             self.page.theme_mode = ft.ThemeMode.LIGHT
             self.dark_light_text.value = "Light theme"
             self.dark_light_icon.icon = ft.icons.BRIGHTNESS_2
+            self.page.theme = self.page.dark_theme = ft.theme.Theme(
+                color_scheme_seed="blue"
+            )
         self.page.update()

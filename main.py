@@ -34,7 +34,8 @@ def main(page: ft.Page):
 
     page.theme_mode = ft.ThemeMode.LIGHT
     page.on_error = lambda e: print("Page error:", e.data)
-
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.add(gallery_view)
     page.on_route_change = route_change
     print(f"Initial route: {page.route}")
