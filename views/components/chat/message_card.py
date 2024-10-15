@@ -1,35 +1,18 @@
 import flet as ft
 
 
-class MessageCard(ft.Container):
+class MessageCard(ft.OutlinedButton):
     def __init__(self, _id: int, title: str, update_callback, **kwargs):
         super(MessageCard, self).__init__(**kwargs)
-        self.border_radius = 10
-
         self.title = title
         self.id = _id
         self.update_callback = update_callback
-        self.content = ft.Container(
-            content=ft.Row(
-                [
-                    ft.Text(
-                        self.title,
-                        size=20,
-                        opacity=0.5,
-                        color=ft.colors.WHITE,
-                        text_align=ft.TextAlign.CENTER,
-                    ),
-                    ft.IconButton(
-                        icon=ft.icons.CLOSE,
-                        width=20,
-                        height=20,
-                        icon_size=10,
-                        alignment=ft.alignment.Alignment(0, 0),
-                        on_click=self.delete_chat
-                    )
-                ]
-            )
-        )
+        self.content = ft.Row(
+            controls=[
+                ft.Text(self.title),
+                ft.IconButton(icon=ft.icons.CLOSE, icon_size=10, on_click=self.delete_chat)],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+
 
     def delete_chat(self, e):
         from apis.db import delete_chat
