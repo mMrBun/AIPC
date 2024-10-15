@@ -168,14 +168,13 @@ class LeftNavigationMenu(ft.Column):
             self.dark_light_text.value = "Dark theme"
             self.dark_light_icon.icon = ft.icons.BRIGHTNESS_HIGH
             self.page.theme = self.page.dark_theme = ft.theme.Theme(
-                color_scheme_seed="yellow",
-
+                color_scheme_seed=ft.colors.random_color(),
             )
         else:
             self.page.theme_mode = ft.ThemeMode.LIGHT
             self.dark_light_text.value = "Light theme"
             self.dark_light_icon.icon = ft.icons.BRIGHTNESS_2
             self.page.theme = self.page.dark_theme = ft.theme.Theme(
-                color_scheme_seed="blue"
+                color_scheme_seed=ft.colors.random_color()
             )
         self.page.update()

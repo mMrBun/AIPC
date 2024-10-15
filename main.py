@@ -18,11 +18,17 @@ def run_migrations():
 
 def main(page: ft.Page):
     page.title = "AIPC"
-
+    page.theme_mode = ft.ThemeMode.LIGHT
+    page.on_error = lambda e: print("Page error:", e.data)
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.fonts = {
         "Roboto Mono": "RobotoMono-VariableFont_wght.ttf",
         "RobotoSlab": "RobotoSlab[wght].ttf",
     }
+    page.theme = page.light_theme = ft.theme.Theme(
+                color_scheme_seed=ft.colors.random_color()
+            )
 
     def get_route_list(route):
         route_list = [item for item in route.split("/") if item != ""]
@@ -38,10 +44,7 @@ def main(page: ft.Page):
 
     gallery_view = GalleryView(gallery)
 
-    page.theme_mode = ft.ThemeMode.LIGHT
-    page.on_error = lambda e: print("Page error:", e.data)
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+
     page.add(gallery_view)
     page.on_route_change = route_change
     page.go(page.route)

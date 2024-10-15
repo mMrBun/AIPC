@@ -11,7 +11,7 @@ def build_page():
     main_structure = ft.Row(
         controls=[
             ft.Container(
-                content=MessageCard.view_all_chat(),
+                content=MessageCard.build_all_chat(),
                 width=200
             ),
             ft.Container(
