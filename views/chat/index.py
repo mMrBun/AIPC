@@ -1,26 +1,22 @@
 import flet as ft
 from views.components.chat.chat_dialog import ChatDialog
+from views.components.chat.message_card import MessageCard
+
 name = "Chat Page"
 description = "Chat Page"
 
 
 def build_page():
+
     main_structure = ft.Row(
         controls=[
             ft.Container(
-                content=ft.Column(
-                    controls=[
-                        ft.Text(value="History 1"),
-                        ft.Text(value="History 2"),
-                        ft.Text(value="History 3"),
-                        # Add more history items here
-                    ]
-                ),
-                width=200  # Fixed width for the history column
+                content=MessageCard.view_all_chat(),
+                width=200
             ),
             ft.Container(
                 content=ChatDialog(),
-                expand=1  # This makes the chat column take up the remaining space
+                expand=1
             ),
             ft.Container(
                 content=ft.Column(

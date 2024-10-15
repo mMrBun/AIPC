@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.10"
 flet = "^0.24.1"
 sqlalchemy = "^2.0.35"
+alembic = "^1.13.3"
 
 
 [build-system]

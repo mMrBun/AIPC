@@ -106,7 +106,8 @@ class GalleryData:
                 module_name = file_name.replace("/", ".").replace(".py", "")
 
                 if module_name in sys.modules:
-                    print(f"{module_name!r} already in sys.modules")
+                    pass
+                    # print(f"{module_name!r} already in sys.modules")
                 else:
                     file_path = os.path.join(
                         str(Path(__file__).parent), "views", file_name
@@ -118,7 +119,7 @@ class GalleryData:
                     module = importlib.util.module_from_spec(spec)
                     sys.modules[module_name] = module
                     spec.loader.exec_module(module)
-                    print(f"{module_name!r} has been imported")
+                    # print(f"{module_name!r} has been imported")
                     example_item = ExampleItem()
                     example_item.example = module.build_page
 

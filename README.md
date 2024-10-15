@@ -93,3 +93,7 @@ The code in this repository is inspired by the following open-source projects. T
 
 [VLLM](https://github.com/vllm-project/vllm)
 
+
+alembic revision --autogenerate -m "Initial migration"
+alembic upgrade head
+

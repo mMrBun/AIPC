@@ -1,14 +1,20 @@
 import logging
 
+
 import flet as ft
 
 from views.components.gallery_view import GalleryView
 from gallerydata import GalleryData
+from alembic import command
+from alembic.config import Config
 
 gallery = GalleryData()
 
 logging.basicConfig(level=logging.INFO)
 
+def run_migrations():
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
 
 def main(page: ft.Page):
     page.title = "AIPC"
@@ -38,8 +44,16 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.add(gallery_view)
     page.on_route_change = route_change
-    print(f"Initial route: {page.route}")
     page.go(page.route)
 
 
-ft.app(main)
+def init_config():
+    run_migrations()
+    # import os
+    # os.system("alembic revision --autogenerate -m \"Initial migration\"")
+    # os.system("alembic upgrade head")
+
+
+if __name__ == '__main__':
+    init_config()
+    ft.app(main)
