@@ -7,6 +7,7 @@ class MessageCard(ft.OutlinedButton):
         self.title = title
         self.id = _id
         self.update_callback = update_callback
+        # self.width = 100
         self.content = ft.Row(
             controls=[
                 ft.Text(self.title),
@@ -33,13 +34,18 @@ class MessageCard(ft.OutlinedButton):
             controls=[
                 ft.Row(
                     controls=[
-                        ft.FilledButton("New Chat", icon=ft.icons.ADD, on_click=add_new_chat),
+                        ft.FilledButton("New Chat", icon=ft.icons.ADD, width=150, on_click=add_new_chat),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER
                 ),
-
-                ft.Column(
-                    controls=[MessageCard(_id=chat.id, title=str(chat.title), update_callback=lambda: update_chat_list(left_chat_message)) for chat in chat_list]
+                ft.Container(
+                    content=ft.Column(
+                        controls=[MessageCard(_id=chat.id, title=str(chat.title),
+                                              update_callback=lambda: update_chat_list(left_chat_message)) for chat in
+                                  chat_list],
+                        scroll=ft.ScrollMode.ALWAYS
+                    ),
+                    expand=True  # This makes the container take all available space
                 )
             ],
         )
@@ -49,5 +55,6 @@ class MessageCard(ft.OutlinedButton):
 def update_chat_list(left_chat_message):
     from apis.db import get_all_chats
     chat_list = get_all_chats()
-    left_chat_message.controls[1].controls = [MessageCard(_id=chat.id, title=str(chat.title), update_callback=lambda: update_chat_list(left_chat_message)) for chat in chat_list]
+    left_chat_message.controls[1].content.controls = [MessageCard(_id=chat.id, title=str(chat.title), update_callback=lambda: update_chat_list(left_chat_message)) for chat in chat_list]
     left_chat_message.update()
+

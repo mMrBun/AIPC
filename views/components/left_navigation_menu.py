@@ -1,4 +1,5 @@
 import flet as ft
+from views.style_const import NAV_COL_MAX_WIDTH, NAV_COL_MIN_WIDTH
 
 class PopupColorItem(ft.PopupMenuItem):
     def __init__(self, color, name):
@@ -39,7 +40,7 @@ class NavigationColumn(ft.Column):
         self.expand = 6
         self.spacing = 0
         self.scroll = ft.ScrollMode.ALWAYS
-        self.width = 200
+        self.width = NAV_COL_MAX_WIDTH
         self.gallery = gallery
         self.selected_index = 0
         self.controls = self.get_navigation_items()
@@ -122,7 +123,7 @@ class LeftNavigationMenu(ft.Column):
                     ]
                 ),
             ],
-            width=200
+            width=NAV_COL_MAX_WIDTH
         )
 
         self.controls = [
@@ -138,8 +139,8 @@ class LeftNavigationMenu(ft.Column):
 
     def update_menu(self):
         if self.is_expanded:
-            self.rail.width = 200
-            self.sub_rail.width = 200
+            self.rail.width = NAV_COL_MAX_WIDTH
+            self.sub_rail.width = NAV_COL_MAX_WIDTH
             self.dark_light_text.visible = True
             self.settings_text.visible = True
             self.toggle_button.icon = ft.icons.ARROW_LEFT
@@ -147,8 +148,8 @@ class LeftNavigationMenu(ft.Column):
                 item.content.controls[1].visible = True
                 item.content.controls[1].opacity = 1
         else:
-            self.rail.width = 50
-            self.sub_rail.width = 50
+            self.rail.width = NAV_COL_MIN_WIDTH
+            self.sub_rail.width = NAV_COL_MIN_WIDTH
             self.dark_light_text.visible = False
             self.settings_text.visible = False
             self.toggle_button.icon = ft.icons.ARROW_RIGHT

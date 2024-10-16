@@ -12,8 +12,10 @@ def build_page():
         controls=[
             ft.Container(
                 content=MessageCard.build_all_chat(),
-                width=200
+                width=150,
+                margin=ft.margin.Margin(10,0,0,0)
             ),
+            ft.VerticalDivider(width=1, trailing_indent=1),
             ft.Container(
                 content=ChatDialog(),
                 expand=1

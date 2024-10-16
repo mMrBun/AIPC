@@ -11,9 +11,10 @@ class GalleryView(ft.Row):
         self.left_nav = LeftNavigationMenu(gallery)
         self.examples_view = ExamplesView(gallery)
         self.expand = True
+        self.spacing = 0
         self.controls = [
             self.left_nav,
-            # ft.VerticalDivider(width=1),
+            ft.VerticalDivider(width=1, trailing_indent=1),
             self.examples_view,
         ]
 
