@@ -36,7 +36,6 @@ def main(page: ft.Page):
 
     def route_change(e):
         route_list = get_route_list(page.route)
-
         if len(route_list) == 0:
             page.go("/chat")
         else:
@@ -51,10 +50,10 @@ def main(page: ft.Page):
 
 
 def init_config():
-    run_migrations()
-    # import os
-    # os.system("alembic revision --autogenerate -m \"Initial migration\"")
-    # os.system("alembic upgrade head")
+    # run_migrations()
+    import os
+    os.system("alembic revision --autogenerate -m \"Initial migration\"")
+    os.system("alembic upgrade head")
 
 
 if __name__ == '__main__':

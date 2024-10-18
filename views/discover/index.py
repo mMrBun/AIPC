@@ -1,8 +1,5 @@
 import flet as ft
 
-name = "Discover Page"
-description = "Discover Page"
-
 def build_page():
     # Top navigation bar
     nav_bar = ft.Row(

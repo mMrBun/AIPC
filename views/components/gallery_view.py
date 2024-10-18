@@ -20,7 +20,7 @@ class GalleryView(ft.Row):
 
     def display_control_examples(self, control_group_name):
         self.examples_view.display(
-            self.gallery.get_control(
+            self.gallery.modules.get(
                 control_group_name
             )
         )

@@ -16,10 +16,9 @@ class ExamplesView(ft.Column):
         self.visible = True
         self.examples.controls = []
 
-        for example in grid_item.examples:
-            self.examples.controls.append(
-                ft.Container(
-                    content=example.example(),
-                    expand=True,
-                ),
-            )
+        self.examples.controls.append(
+            ft.Container(
+                content=grid_item,
+                expand=True,
+            ),
+        )

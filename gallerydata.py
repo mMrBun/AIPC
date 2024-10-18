@@ -1,8 +1,9 @@
-import os
-import sys
 import flet as ft
-import importlib.util
-from pathlib import Path
+from views.chat.index import build_page as chat_page
+from views.discover.index import build_page as discover_page
+from views.knowledgebase.index import build_page as knowledgebase_page
+from views.knowledgebase_settings.index import build_page as knowledgebase_settings_page
+from views.model_settings.index import build_page as model_settings_page
 
 
 
@@ -75,65 +76,10 @@ class GalleryData:
                 visible=False
             )
         ]
-        self.import_modules()
-
-    def get_control_group(self, control_group_name):
-        for control_group in self.control_groups:
-            if control_group.name == control_group_name:
-                return control_group
-
-    def get_control(self, control_group_name):
-        control_group = self.get_control_group(control_group_name)
-        for grid_item in control_group.grid_items:
-            if grid_item.id == control_group_name:
-                return grid_item
-        return control_group
-
-    def list_example_files(self, control_group_dir):
-        file_path = os.path.join(
-            str(Path(__file__).parent), "views", control_group_dir
-        )
-        example_files = [f for f in os.listdir(file_path) if f in ['index.py']]
-        return example_files
-
-    def import_modules(self):
-        for control_group_dir in self.control_groups:
-
-            grid_item = GridItem(control_group_dir.name)
-
-            for file in self.list_example_files(control_group_dir.name):
-                file_name = os.path.join(control_group_dir.name, file)
-                module_name = file_name.replace("/", ".").replace(".py", "")
-
-                if module_name in sys.modules:
-                    pass
-                    # print(f"{module_name!r} already in sys.modules")
-                else:
-                    file_path = os.path.join(
-                        str(Path(__file__).parent), "views", file_name
-                    )
-
-                    spec = importlib.util.spec_from_file_location(
-                        module_name, file_path
-                    )
-                    module = importlib.util.module_from_spec(spec)
-                    sys.modules[module_name] = module
-                    spec.loader.exec_module(module)
-                    # print(f"{module_name!r} has been imported")
-                    example_item = ExampleItem()
-                    example_item.example = module.build_page
-
-                    example_item.file_name = (
-                        module_name.replace(".", "/") + ".py"
-                    )
-                    example_item.name = module.name
-                    example_item.order = file[
-                        :2
-                    ]  # first 2 characters of example file name (e.g. '01')
-                    grid_item.examples.append(example_item)
-            grid_item.examples.sort(key=lambda x: x.order)
-            control_group_dir.grid_items.append(grid_item)
-            try:
-                control_group_dir.grid_items.sort(key=lambda x: x.name)
-            except:
-                print(control_group_dir.name, control_group_dir.grid_items)
+        self.modules = {
+            "chat": chat_page(),
+            "knowledgebase": knowledgebase_page(),
+            "discover": discover_page(),
+            "knowledgebase_settings": knowledgebase_settings_page(),
+            "model_settings": model_settings_page()
+        }

@@ -1,8 +1,5 @@
 import flet as ft
 
-name = "Knowledgebase Page"
-description = "Knowledgebase Page"
-
 def build_page():
     # Sidebar
     sidebar = ft.Container(
