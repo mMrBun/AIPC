@@ -52,9 +52,9 @@ def new_chat_message(message_card_id: int, history_content: str) -> int:
         return chat_message.id
 
 
-def get_chat_messages_by_chat_id(message_card_id: int) -> list:
+def get_chat_messages_by_chat_id(message_card_id: int) -> Type[ChatMessage]:
     with Session() as session:
-        chat_messages = session.query(ChatMessage).filter(ChatMessage.message_card_id is message_card_id).all()
+        chat_messages = session.query(ChatMessage).filter(ChatMessage.message_card_id == message_card_id).first()
         return chat_messages
 
 def new_assistant_card(title: str, description: str, content: str) -> int:
@@ -74,7 +74,7 @@ def get_all_assistant_cards() -> list[Type[AssistantCard]]:
 def get_assistant_card_by_id(assistant_card_id: int) -> Type[AssistantCard]:
 
     with Session() as session:
-        assistant_card = session.query(AssistantCard).filter(AssistantCard.id is assistant_card_id).first()
+        assistant_card = session.query(AssistantCard).filter(AssistantCard.id == assistant_card_id).first()
         return assistant_card
 
 

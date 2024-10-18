@@ -13,6 +13,11 @@ sqlalchemy = "^2.0.35"
 alembic = "^1.13.3"
 
 
+[[tool.poetry.source]]
+name = "intel-pytorch-extension"
+url = "https://pytorch-extension.intel.com/release-whl/stable/lnl/cn/"
+priority = "primary"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

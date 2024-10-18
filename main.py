@@ -19,7 +19,7 @@ def run_migrations():
 def main(page: ft.Page):
     page.title = "AIPC"
     page.theme_mode = ft.ThemeMode.LIGHT
-    page.on_error = lambda e: print("Page error:", e.data)
+    # page.on_error = lambda e: print("Page error:", e.data)
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.fonts = {

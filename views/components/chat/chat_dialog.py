@@ -1,197 +1,36 @@
+# chat_dialog.py
+import json
+from typing import List
+
 import flet as ft
 
-
-class Message:
-    def __init__(self, sender, content, plugins=None):
-        self.sender = sender
-        self.content = content
-        self.plugins = plugins or []
-
-
-class Plugin:
-    def __init__(self, name, input_data, output_data):
-        self.name = name
-        self.input_data = input_data
-        self.output_data = output_data
-        self.is_loading = True
-        self.show_details = False
-
-
-
+from apis.db import get_chat_messages_by_chat_id
+from apis.protocol import ChatMessage, Role, MultimodalInputItem
+from apis.llms.llm_xpu import generate
 
 class ChatDialog(ft.Column):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.messages = [
-            Message(sender='user', content="Hi there! This is a test message."),
-            Message(sender='assistant', content="Hello! I'm happy to help you."),
-            Message(
-                sender='user',
-                content="How to write a quick sort in python?",
-            ),
-            Message(
-                sender='assistant',
-                content="""
-
-
-# Flet
-
-<img src="https://raw.githubusercontent.com/flet-dev/flet/flet-widget/media/logo/flet-logo.svg" width="50%"/>
-
-Flet is a framework for adding server-driven UI (SDUI) experiences to existing Flutter apps or building standalone web, mobile and desktop apps with Flutter UI.
-
-Add an interactive `FletApp` widget to your Flutter app whose content is controlled by a remote Python script.
-It is an ideal solution for building non-core or frequently changing functionality such as product catalog, feedback form, in-app survey or support chat. Flet enables your team to ship new features faster by reducing the number of App Store validation cycles. Just re-deploy a web app hosting a Python script and your users will get an instant update!
-
-On the server side Flet provides an easy to learn programming model that enables Python developers without prior Flutter (or even front-end) experience to participate in development of your larger Flutter app or build their own apps with Flutter UI from scratch.
-
-## Getting started with Flet
-
-### Install `flet` Python module
-
-Flet requires Python 3.7 or above. To start with Flet, you need to install flet module first:
-
-```
-pip install flet
-```
-
-### Create Python program
-
-Create a new Python program using Flet which will be driving the content of `FletApp` widget.
-
-Let's do a simple `counter.py` app similar to a Flutter new project template:
-
-```python
-import flet
-from flet import IconButton, Page, Row, TextField, icons
-
-def main(page: Page):
-    page.title = "Flet counter example"
-    page.vertical_alignment = "center"
-
-    txt_number = TextField(value="0", text_align="right", width=100)
-
-    def minus_click(e):
-        txt_number.value = int(txt_number.value) - 1
-        page.update()
-
-    def plus_click(e):
-        txt_number.value = int(txt_number.value) + 1
-        page.update()
-
-    page.add(
-        Row(
-            [
-                IconButton(icons.REMOVE, on_click=minus_click),
-                txt_number,
-                IconButton(icons.ADD, on_click=plus_click),
-            ],
-            alignment="center",
-        )
-    )
-
-flet.app(target=main, port=8550)
-```
-
-Run the app:
-
-```
-python counter.py
-```
-
-You should see the app running in a native OS window.
-
-There is a web server (Fletd) running in the background on a fixed port `8550`. Fletd web server is a "bridge" between Python and Flutter.
-
-`FletApp` widget in your Flutter application will be communicating with Fletd web server via WebSockets to receive UI updates and send user-generated UI events.
-
-For production use Python app along with Fletd could be [deployed to a public web host](https://flet.dev/docs/guides/python/deploying-web-app) and be accessible via HTTPS with domain name.
-
-### Add Flet widget to a Flutter app
-
-Create a new or open existing Flutter project.
-
-Install Flutter `flet` package:
-
-```
-flutter pub add flet
-```
-
-For a new project replace `main.dart` with the following:
-
-```dart
-import 'package:flet/flet.dart';
-import 'package:flutter/material.dart';
-
-void main() async {
-  await setupDesktop();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flet Flutter Demo',
-      home: FletApp(pageUrl: "http://localhost:8550"),
-    );
-  }
-}
-```
-
-In the app above `FletApp` widget is hosted inside `MaterialApp` widget.
-
-If Flet app must be able to handle page route change events (web browser URL changes, mobile app deep linking) it must be the top most widget as it contains its own `MaterialApp` widget handling route changes:
-
-```dart
-import 'package:flet/flet.dart';
-import 'package:flutter/material.dart';
-
-void main() async {
-  await setupDesktop();
-  runApp(const FletApp(pageUrl: "http://localhost:8550"));
-}
-```
-
-Run the program and see Flet app running inside a Flutter app.
-
-When adding `FletApp` widget to the existing desktop Flutter app make sure `setupDesktop()` is called before `runApp()` to initialize Flet's built-in window manager.
-
-## Flet learning resources
-
-* [Getting started for Python](https://flet.dev/docs/guides/python/getting-started/)
-* [Controls reference](https://flet.dev/docs/controls)
-* [Tutorials](https://flet.dev/docs/tutorials)
-* [Examples](https://github.com/flet-dev/examples/tree/main/python)
-
-## Flet community
-
-* [Discussions](https://github.com/flet-dev/flet/discussions)
-* [Discord](https://discord.gg/dzWXP8SHG8)
-* [Twitter](https://twitter.com/fletdev)
-* [Email](mailto:hello@flet.dev)
-
-## FAQ
-
-Coming soon.
-
-## Adding custom Flutter widgets
-
-Coming soon.
-        """,
-            ),
-
-        ]
+        self.messages = []
         self.list_view = ft.ListView(
-            controls=[self.build_message(msg) for msg in self.messages],
+            controls=[],
             expand=True,
             auto_scroll=True,
             padding=0,
         )
-
-
+        self.input_control = ft.TextField(
+            value="",
+            multiline=True,
+            min_lines=1,
+            border_radius=15,
+            border=ft.InputBorder.OUTLINE,
+            content_padding=ft.Padding(10, 10, 10, 10),
+            on_submit=self.send_message,
+            label="Enter to send message,Shift+Enter to new line",
+            filled=True,
+            shift_enter=True,
+            suffix_icon=ft.icons.SEND_ROUNDED
+        )
 
         self.controls = [
             ft.Container(
@@ -208,19 +47,8 @@ Coming soon.
                             rotate=35
                         ),
                         ft.Container(
-                            content=ft.TextField(
-                                value="",
-                                multiline=True,
-                                min_lines=1,
-                                border_radius=15,
-                                border=ft.InputBorder.OUTLINE,
-                                content_padding=ft.Padding(10, 10, 10, 10),
-                            ),
+                            content=self.input_control,
                             expand=True
-                        ),
-                        ft.IconButton(
-                            icon=ft.icons.SEND,
-                            tooltip="Send"
                         )
                     ],
                     alignment=ft.MainAxisAlignment.START,
@@ -229,42 +57,65 @@ Coming soon.
                 padding=ft.padding.all(10)
             )
         ]
-    def build_message(self, msg: Message):
-        if msg.sender == 'user':
+
+    def load_chat(self, chat_id):
+        """加载指定聊天 ID 的消息"""
+        self.messages = get_chat_messages_by_chat_id(chat_id)
+        if self.messages:
+            self.list_view.controls = self.build_message(self.messages)
+        else:
+            self.list_view.controls = []
+        self.update()
+
+    def build_message_control(self, content, role):
+        # 现有的构建消息的方法
+        if role == 'user':
             avatar = ft.Icon(ft.icons.PERSON, size=40)
-            # bubble_color = ft.colors.BLUE_100
         else:
             avatar = ft.Icon(ft.icons.AIR, size=40)
-            # bubble_color = ft.colors.GREEN_100
 
-        bubble_content = ft.Markdown(value=msg.content,
-                                     selectable=True,
-                                     extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-                                     code_theme=ft.MarkdownCodeTheme.ATOM_ONE_DARK,
-                                     code_style=ft.TextStyle(font_family="Roboto Mono"),
-                                     on_tap_link=lambda e: self.page.launch_url(e.data),
-                                     )
-        bubble = ft.Container(
-            content=bubble_content,
-            padding=ft.padding.all(10),
-            margin=ft.Margin(0,0,0,10),
-            border=ft.Border(top=ft.BorderSide(1),left=ft.BorderSide(1),right=ft.BorderSide(1),bottom=ft.BorderSide(1)),
-            border_radius=ft.border_radius.all(10),
-            width=500,
+        # 移除 expand=True 以允许文本换行
+        bubble_content = ft.Markdown(
+            value=content,
+            selectable=True,
+            extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+            code_theme=ft.MarkdownCodeTheme.ATOM_ONE_DARK,
+            code_style=ft.TextStyle(font_family="Roboto Mono"),
+            on_tap_link=lambda e: self.page.launch_url(e.data),
+            # expand=True  # 移除此行
         )
 
-        if msg.sender == 'user':
+        # 添加 max_width 以限制气泡的最大宽度，避免过宽
+        bubble = ft.Container(
+            content=bubble_content,
+            padding=ft.Padding(10,10,10,10),
+            margin=ft.Margin(0, 0, 0, 10),
+            border=ft.Border(
+                left=ft.BorderSide(width=1),
+                right=ft.BorderSide(width=1),
+                top=ft.BorderSide(width=1),
+                bottom=ft.BorderSide(width=1)
+            ),
+            border_radius=ft.border_radius.all(10),
+            # 设置最大宽度，例如 500 像素，可根据需要调整
+            # max_width=500,
+            # 确保容器内部内容可以换行
+            # expand=True
+        )
+
+        if role == 'user':
             message_row = ft.Row(
                 [
                     ft.Container(
                         content=bubble,
-                        margin=ft.margin.symmetric(horizontal=10)
+                        margin=ft.margin.symmetric(horizontal=10),
+                        expand=True  # 确保气泡可以根据需要扩展，但不超过 max_width
                     ),
                     avatar,
                 ],
                 alignment=ft.MainAxisAlignment.END,
                 vertical_alignment=ft.CrossAxisAlignment.START,
-                expand=True
+                # expand=True
             )
         else:
             message_row = ft.Row(
@@ -272,12 +123,89 @@ Coming soon.
                     avatar,
                     ft.Container(
                         content=bubble,
-                        margin=ft.margin.symmetric(horizontal=10)
+                        margin=ft.margin.symmetric(horizontal=10),
+                        expand=True  # 确保气泡可以根据需要扩展，但不超过 max_width
                     ),
                 ],
                 alignment=ft.MainAxisAlignment.START,
                 vertical_alignment=ft.CrossAxisAlignment.START,
-                expand=True
+                # expand=True
+
+            )
+        return message_row
+
+    def build_message(self, msg):
+        content = msg.history_content
+        messages = convert_history_to_chat_messages(content)
+        controls = []
+        for message in messages:
+            message_row = self.build_message_control(message.content, message.role)
+            controls.append(message_row)
+        return controls
+
+    def send_message(self, e):
+        # 你需要实现发送消息的逻辑
+        message = e.control.value
+        message_row = self.build_message_control(message, 'user')
+        self.list_view.controls.append(message_row)
+        self.input_control.value = ""
+        self.input_control.disabled = True
+        generator = generate(message)
+        assistant_row = self.build_message_control("", 'system')
+        self.list_view.controls.append(assistant_row)
+        self.update()
+        content = ""
+        for chunk in generator:
+            content += chunk
+            assistant_row.controls[1].content.content.value = content
+            assistant_row.update()
+        self.input_control.disabled = False
+        self.update()
+
+
+
+def convert_history_to_chat_messages(history_str: str) -> List[ChatMessage]:
+    """
+    将历史消息的JSON字符串转换为ChatMessage对象列表。
+
+    :param history_str: 历史消息的JSON字符串
+    :return: ChatMessage对象的列表
+    """
+    try:
+        # 解析JSON字符串
+        history_data = json.loads(history_str)
+
+        chat_messages = []
+        for msg in history_data:
+            # 获取角色并转换为Role枚举
+            role_str = msg.get("role")
+            if role_str not in Role.__members__.values():
+                raise ValueError(f"未知的角色: {role_str}")
+            role = Role(role_str)
+
+            # 获取内容，可以是字符串或多模态输入项的列表
+            content = msg.get("content")
+            if isinstance(content, str):
+                content_parsed = content
+            elif isinstance(content, list):
+                content_parsed = [MultimodalInputItem(**item) for item in content]
+            else:
+                content_parsed = None  # 或者根据需求处理其他类型
+
+            # 创建ChatMessage实例
+            chat_message = ChatMessage(
+                role=role,
+                content=content_parsed
+                # 如果有tool_calls，可以在这里处理并赋值
             )
 
-        return message_row
+            chat_messages.append(chat_message)
+
+        return chat_messages
+
+    except json.JSONDecodeError as e:
+        print("JSON解析错误:", e)
+        return []
+    except Exception as e:
+        print("转换过程中发生错误:", e)
+        return []
