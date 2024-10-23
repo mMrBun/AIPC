@@ -1,6 +1,6 @@
 import os
 from typing import List, Type
-
+from apis.db_models.model import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from ..db_models.model import (
@@ -12,6 +12,7 @@ ChatMessage,
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///test.sqlite')
 
 engine = create_engine(DATABASE_URL, echo=True)
+Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 
@@ -44,12 +45,23 @@ def delete_chat(_id: int) -> None:
 
 
 
+
 def new_chat_message(message_card_id: int, history_content: str) -> int:
     with Session() as session:
         chat_message = ChatMessage(message_card_id=message_card_id, history_content=history_content)
         session.add(chat_message)
         session.commit()
         return chat_message.id
+
+
+def update_chat_message(message_card_id: int, history_content: str) -> None:
+    with Session() as session:
+        chat_message = session.query(ChatMessage).filter(ChatMessage.message_card_id == message_card_id).first()
+        if chat_message:
+            chat_message.history_content = history_content
+            session.commit()
+        else:
+            new_chat_message(message_card_id, history_content)
 
 
 def get_chat_messages_by_chat_id(message_card_id: int) -> Type[ChatMessage]:

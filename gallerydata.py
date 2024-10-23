@@ -1,5 +1,5 @@
 import flet as ft
-from views.chat.index import build_page as chat_page
+from views.chat.index import MainPage
 from views.discover.index import build_page as discover_page
 from views.knowledgebase.index import build_page as knowledgebase_page
 from views.knowledgebase_settings.index import build_page as knowledgebase_settings_page
@@ -76,8 +76,9 @@ class GalleryData:
                 visible=False
             )
         ]
+        main_page = MainPage()
         self.modules = {
-            "chat": chat_page(),
+            "chat": main_page.build(),
             "knowledgebase": knowledgebase_page(),
             "discover": discover_page(),
             "knowledgebase_settings": knowledgebase_settings_page(),

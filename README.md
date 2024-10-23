@@ -96,4 +96,28 @@ The code in this repository is inspired by the following open-source projects. T
 
 alembic revision --autogenerate -m "Initial migration"
 alembic upgrade head
+[tool.poetry]
+name = "aipc"
+version = "0.1.0"
+description = ""
+authors = ["MrBun"]
+license = "Apache-2.0 license"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flet = "^0.24.1"
+sqlalchemy = "^2.0.35"
+alembic = "^1.13.3"
+
+[[tool.poetry.source]]
+name = "intel-pytorch-extension"
+url = "https://pytorch-extension.intel.com/release-whl/stable/lnl/cn/"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
 
